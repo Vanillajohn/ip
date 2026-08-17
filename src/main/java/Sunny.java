@@ -14,79 +14,119 @@ public class Sunny {
         List<String> listRemarks = List.of("Here's your LL (lame list):", "Go write this down so I don't have to show it to you again:");
         List<List<String>> listNumberRemarks = List.of(List.of("Now you have ", " tasks in your list. Whoop de doo."), List.of("Go do your ", " tasks already!"));
         List<String> taskAddRemarks = List.of("Task added. Can I go now?", "Task added. Appreciation ignored.");
+        List<List<String>> descEmpty = List.of(List.of("A "," description can't be empty, dummy!"), List.of("What am I supposed to do if your "," task has no description?"));
+        List<String> unrecognised = List.of("What does that mean?", "I normally don't understand you, but now I really don't.");
+        List<String> insufficient = List.of("Very funny. Not enough info and I won't help you!", "You didn't give me enough info! Don't test me!");
+        List<String> tooMany = List.of("Your taskboard can only hold so many!", "I can't add any more!");
         Task[] tasks = new Task[101];
         int taskCount = 1;
         Scanner scanner = new Scanner(System.in);
+        Random uniRand = new Random();
 
         System.out.println("____________________________________________________________");
         speak(greetings);
         System.out.println("____________________________________________________________");
 
-        while (true){
-            String input = scanner.nextLine();
-            String[] parts = input.split(" ");
-            String command = parts[0];
-            Task temp = null;
+        while (true) {
+            try{
+                if (taskCount == 101){
+                    int index = uniRand.nextInt(tooMany.size());
+                    throw new tooManyTasksException(tooMany.get(index));
+                }
+                String input = scanner.nextLine();
+                String[] parts = input.split(" ");
+                String command = parts[0];
+                Task temp = null;
 
-            switch (command){
-                case "bye":
-                    scanner.close();
-                    System.out.println("____________________________________________________________");
-                    speak(goodbyes);
-                    System.out.println("____________________________________________________________");
-                    return;
-                case "list":
-                    int i = 1;
-                    System.out.println("____________________________________________________________");
-                    speak(listRemarks);
-                    while (tasks[i] != null) {
-                        System.out.println(i + "." + tasks[i]);
-                        i += 1;
-                    }
-                    System.out.println("____________________________________________________________");
-                    continue;
-                case "mark":
-                    int index1 = Integer.parseInt(parts[1]);
-                    tasks[index1].mark();
-                    System.out.println("____________________________________________________________");
-                    speak(taskMark);
-                    System.out.println(index1 + "." + tasks[index1]);
-                    System.out.println("____________________________________________________________");
-                    continue;
-                case "unmark":
-                    int index2 = Integer.parseInt(parts[1]);
-                    tasks[index2].unmark();
-                    System.out.println("____________________________________________________________");
-                    speak(taskUnmark);
-                    System.out.println(index2 + "." + tasks[index2]);
-                    System.out.println("____________________________________________________________");
-                    continue;
-                case "todo":
-                    temp = new ToDo(String.join(" ", input.substring(4)));
-                    break;
-                case "deadline":
-                    int slashIndex = input.indexOf("/");
-                    temp = new Deadline(String.join(" ", input.substring(9)), input.substring(slashIndex + 4).trim());
-                    break;
-                case "event":
-                    int firstSlash = input.indexOf("/");
-                    int secondSlash = input.indexOf("/", firstSlash + 1);
+                switch (command) {
+                    case "bye":
+                        scanner.close();
+                        System.out.println("____________________________________________________________");
+                        speak(goodbyes);
+                        System.out.println("____________________________________________________________");
+                        return;
+                    case "list":
+                        int i = 1;
+                        System.out.println("____________________________________________________________");
+                        speak(listRemarks);
+                        while (tasks[i] != null) {
+                            System.out.println(i + "." + tasks[i]);
+                            i += 1;
+                        }
+                        System.out.println("____________________________________________________________");
+                        continue;
+                    case "mark":
+                        int index1 = Integer.parseInt(parts[1]);
+                        tasks[index1].mark();
+                        System.out.println("____________________________________________________________");
+                        speak(taskMark);
+                        System.out.println(index1 + "." + tasks[index1]);
+                        System.out.println("____________________________________________________________");
+                        continue;
+                    case "unmark":
+                        int index2 = Integer.parseInt(parts[1]);
+                        tasks[index2].unmark();
+                        System.out.println("____________________________________________________________");
+                        speak(taskUnmark);
+                        System.out.println(index2 + "." + tasks[index2]);
+                        System.out.println("____________________________________________________________");
+                        continue;
+                    case "todo":
+                        if (parts.length == 1){
+                            int index = uniRand.nextInt(descEmpty.size());
+                            throw new TaskEmptyDescException(descEmpty.get(index), "todo");
+                        }
+                        temp = new ToDo(String.join(" ", input.substring(4)));
+                        break;
+                    case "deadline":
+                        if (parts.length == 1){
+                            int index = uniRand.nextInt(descEmpty.size());
+                            throw new TaskEmptyDescException(descEmpty.get(index), "deadline");
+                        }
+                        int slashIndex = input.indexOf("/");
+                        if (slashIndex == -1){
+                            int index = uniRand.nextInt(insufficient.size());
+                            throw new insufficientInfoException(insufficient.get(index));
+                        }
+                        temp = new Deadline(String.join(" ", input.substring(9)), input.substring(slashIndex + 4).trim());
+                        break;
+                    case "event":
+                        if (parts.length == 1){
+                            int index = uniRand.nextInt(descEmpty.size());
+                            throw new TaskEmptyDescException(descEmpty.get(index), "event");
+                        }
+                        int firstSlash = input.indexOf("/");
+                        int secondSlash = input.indexOf("/", firstSlash + 1);
+                        if (firstSlash == -1 || secondSlash == -1){
+                            int index = uniRand.nextInt(insufficient.size());
+                            throw new insufficientInfoException(insufficient.get(index));
+                        }
 
-                    String desc = input.substring(6, firstSlash).trim();
-                    String start = input.substring(firstSlash + 5, secondSlash).trim();
-                    String end = input.substring(secondSlash + 4).trim();
+                        String desc = input.substring(6, firstSlash).trim();
+                        String start = input.substring(firstSlash + 5, secondSlash).trim();
+                        String end = input.substring(secondSlash + 4).trim();
 
-                    temp = new Event(desc, start, end);
-                    break;
+                        temp = new Event(desc, start, end);
+                        break;
+                }
+                if (temp == null) {
+                    int index = uniRand.nextInt(unrecognised.size());
+                    throw new UnrecognisedTaskException(unrecognised.get(index));
+                }
+                tasks[taskCount] = temp;
+                taskCount += 1;
+                System.out.println("____________________________________________________________");
+                speak(taskAddRemarks);
+                System.out.println("    " + temp);
+                speakListNum(listNumberRemarks, taskCount);
+                speak(taskRemarks);
+                System.out.println("____________________________________________________________");
             }
-            tasks[taskCount] = temp;
-            taskCount += 1;
-            System.out.println("____________________________________________________________");
-            speak(taskAddRemarks);
-            System.out.println("    " + temp);
-            speakListNum(listNumberRemarks, taskCount);
-            speak(taskRemarks);
-            System.out.println("____________________________________________________________");
+            catch (UnrecognisedTaskException | TaskEmptyDescException | insufficientInfoException | tooManyTasksException e) {
+                System.out.println("____________________________________________________________");
+                System.out.println(e.getMessage());
+                System.out.println("____________________________________________________________");
+            }
         }
     }
 
