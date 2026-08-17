@@ -1,6 +1,6 @@
 public class Task{
-    private String desc;
-    private boolean marked;
+    protected String desc;
+    protected boolean marked;
 
     public Task (String desc){
         this.desc = desc;
@@ -16,5 +16,9 @@ public class Task{
     }
     public void unmark(){
         this.marked = false;
+    }
+    @Override
+    public String toString() {
+        return "[" + this.getStatusIcon() + "] " + this.desc;
     }
 }
