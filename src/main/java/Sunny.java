@@ -5,7 +5,6 @@ import java.util.ArrayList;
 
 public class Sunny {
         public static void main(String[] args) {
-            // exception if trying to delete things that aren't there, mark things that aren't there
             // more specific error handling that tells user what to do
             // add comments to explain things
 
@@ -13,21 +12,23 @@ public class Sunny {
         List<String> goodbyes = List.of("Don't tell anyone I helped you, got it?", "See you never.", "Jeez, you really depend on me, don't you?");
         List<String> taskRemarks = List.of("", "I'm only helping you because you now owe me.", "I could be doing so much more right now.",
                                            "What a waste of time.", "Can't you do this yourself?");
-        List<String> taskMark = List.of("Yeah, yeah. Marked it already", "Done. Can you leave me alone now?");
-        List<String> taskUnmark = List.of("Can't you do this yourself?", "Done. Can you leave me alone now?");
+        List<String> taskMark = List.of("Yeah, yeah. Marked it already", "Done. Can you leave me alone now?", "You better help me when I need it!");
+        List<String> taskUnmark = List.of("Can't you unmark this yourself?", "Done. Can you leave me alone now?", "You better help me when I need it!");
         List<String> listRemarks = List.of("Here's your LL (lame list):", "Go write this down so I don't have to show it to you again:");
         List<List<String>> listNumberRemarks = List.of(List.of("Now you have ", " tasks in your list. Whoop de doo."), List.of("Go do your ", " tasks already!"));
         List<String> taskAddRemarks = List.of("Task added. Can I go now?", "Task added. Appreciation ignored.");
         List<List<String>> descEmpty = List.of(List.of("A "," description can't be empty, dummy!"), List.of("What am I supposed to do if your "," task has no description?"));
         List<String> unrecognised = List.of("Is that a joke? What does that mean?", "I normally don't understand you, but now I really don't.");
         List<String> insufficient = List.of("Very funny. Not enough info and I won't help you!", "You didn't give me enough info! Don't test me!");
-        List<String> tooMany = List.of("Your taskboard can only hold so many!", "I can't add any more!");
-        List<String> deleting = List.of("If you want this deleted, why did you add it?", "I've added it and now you want me to remove it?");
+        List<String> tooMany = List.of("Your taskboard can only hold so many!", "I can't add any more!", "Go get a bigger taskboard!");
+        List<String> deleting = List.of("If you want this deleted, why did you add it?", "I've added it and now you want me to remove it?", "Now I'm DELETING for you too?");
+        List<String> missingTask = List.of("There's no task there!", "I ain't doing anything if nothing's there!");
+        List<String> notInteger = List.of("I need a VALID INTEGER doofus!", "You're in CS and you don't know what a VALID INTEGER is?");
 
         ArrayList<Task> tasks = new ArrayList<>(101);
         int taskCount = 0;
-        Scanner scanner = new Scanner(System.in);
-        Random uniRand = new Random();
+        Scanner scanner = new Scanner(System.in);//the scanner for user input
+        Random uniRand = new Random();//a random whenever something needs a random number
 
         System.out.println("____________________________________________________________");
         speak(greetings);
@@ -41,7 +42,7 @@ public class Sunny {
                 }
                 String input = scanner.nextLine();
                 String[] parts = input.split(" ");
-                String command = parts[0];
+                String command = parts[0].toLowerCase();
                 Task temp = null;
 
                 switch (command) {
@@ -67,24 +68,34 @@ public class Sunny {
                             throw new insufficientInfoException(insufficient.get(index));
                         }
                         int index1 = Integer.parseInt(parts[1]) - 1;
-                        tasks.get(index1).mark();
-                        System.out.println("____________________________________________________________");
-                        speak(taskMark);
-                        System.out.println(index1 + "." + tasks.get(index1));
-                        System.out.println("____________________________________________________________");
-                        continue;
+                        if (index1 >= 0 && index1 < tasks.size() && tasks.get(index1) != null){ //if tasks at index has something
+                            tasks.get(index1).mark();
+                            System.out.println("____________________________________________________________");
+                            speak(taskMark);
+                            System.out.println(index1 + "." + tasks.get(index1));
+                            System.out.println("____________________________________________________________");
+                            continue;
+                        } else {//if there's nothing at index, either null or out of bounds
+                            int index = uniRand.nextInt(missingTask.size());
+                            throw new taskOutOfBoundsException(missingTask.get(index));
+                        }
                     case "unmark":
                         if (parts.length == 1){
                             int index = uniRand.nextInt(insufficient.size());
                             throw new insufficientInfoException(insufficient.get(index));
                         }
                         int index2 = Integer.parseInt(parts[1]) - 1;
-                        tasks.get(index2).unmark();
-                        System.out.println("____________________________________________________________");
-                        speak(taskUnmark);
-                        System.out.println(index2 + "." + tasks.get(index2));
-                        System.out.println("____________________________________________________________");
-                        continue;
+                        if (index2 >= 0 && index2 < tasks.size() && tasks.get(index2) != null) {//if tasks at index has something
+                            tasks.get(index2).unmark();
+                            System.out.println("____________________________________________________________");
+                            speak(taskUnmark);
+                            System.out.println(index2 + "." + tasks.get(index2));
+                            System.out.println("____________________________________________________________");
+                            continue;
+                        } else {//if there's nothing at index, either null or out of bounds
+                            int index = uniRand.nextInt(missingTask.size());
+                            throw new taskOutOfBoundsException(missingTask.get(index));
+                        }
                     case "todo":
                         if (parts.length == 1){
                             int index = uniRand.nextInt(descEmpty.size());
@@ -97,28 +108,27 @@ public class Sunny {
                             int index = uniRand.nextInt(descEmpty.size());
                             throw new TaskEmptyDescException(descEmpty.get(index), "deadline");
                         }
-                        int slashIndex = input.indexOf("/");
+                        int slashIndex = input.indexOf("/by");
                         if (slashIndex == -1){
                             int index = uniRand.nextInt(insufficient.size());
                             throw new insufficientInfoException(insufficient.get(index));
                         }
-                        temp = new Deadline(String.join(" ", input.substring(9)), input.substring(slashIndex + 4).trim());
+                        temp = new Deadline(String.join(" ", input.substring(9, slashIndex)).trim(), input.substring(slashIndex + 3).trim());
                         break;
                     case "event":
                         if (parts.length == 1){
                             int index = uniRand.nextInt(descEmpty.size());
                             throw new TaskEmptyDescException(descEmpty.get(index), "event");
                         }
-                        int firstSlash = input.indexOf("/");
-                        int secondSlash = input.indexOf("/", firstSlash + 1);
-                        if (firstSlash == -1 || secondSlash == -1){
+                        int firstSlash = input.indexOf("/from");
+                        int secondSlash = input.indexOf("/to");
+                        if (firstSlash == -1 || secondSlash == -1 || firstSlash > secondSlash){
                             int index = uniRand.nextInt(insufficient.size());
                             throw new insufficientInfoException(insufficient.get(index));
                         }
-
-                        String desc = input.substring(6, firstSlash).trim();
+                        String desc = input.substring(6, firstSlash);
                         String start = input.substring(firstSlash + 5, secondSlash).trim();
-                        String end = input.substring(secondSlash + 4).trim();
+                        String end = input.substring(secondSlash + 3).trim();
 
                         temp = new Event(desc, start, end);
                         break;
@@ -128,16 +138,20 @@ public class Sunny {
                             throw new insufficientInfoException(insufficient.get(index));
                         }
                         int index3 = Integer.parseInt(parts[1]) - 1;
-                        temp = tasks.get(index3);
-                        tasks.remove(index3);
-                        taskCount -= 1;
-                        System.out.println("____________________________________________________________");
-                        speak(deleting);
-                        System.out.println("    " + temp);
-                        speakListNum(listNumberRemarks, taskCount + 1);
-                        System.out.println("____________________________________________________________");
-                        continue;
-
+                        if (index3 >= 0 && index3 < tasks.size() && tasks.get(index3) != null) {//if tasks at index has something
+                            temp = tasks.get(index3);
+                            tasks.remove(index3);
+                            taskCount -= 1;
+                            System.out.println("____________________________________________________________");
+                            speak(deleting);
+                            System.out.println("    " + temp);
+                            speakListNum(listNumberRemarks, taskCount + 1);
+                            System.out.println("____________________________________________________________");
+                            continue;
+                        } else {//if there's nothing at index, either null or out of bounds
+                            int index = uniRand.nextInt(missingTask.size());
+                            throw new taskOutOfBoundsException(missingTask.get(index));
+                        }
                 }
                 if (temp == null) {
                     int index = uniRand.nextInt(unrecognised.size());
@@ -152,15 +166,21 @@ public class Sunny {
                 speak(taskRemarks);
                 System.out.println("____________________________________________________________");
             }
-            catch (UnrecognisedTaskException | TaskEmptyDescException | insufficientInfoException | tooManyTasksException e) {
+            catch (UnrecognisedTaskException | TaskEmptyDescException | insufficientInfoException | tooManyTasksException | taskOutOfBoundsException e) {
                 System.out.println("____________________________________________________________");
                 System.out.println(e.getMessage());
                 System.out.println("____________________________________________________________");
             }
+            catch (NumberFormatException e) { //if something other than an integer was used, or the integer is too large/small
+                int index = uniRand.nextInt(notInteger.size());
+                System.out.println("____________________________________________________________");
+                System.out.println(notInteger.get(index));
+                System.out.println("____________________________________________________________");
+            } //no catch for out of bounds to see if code was the issue rather than user
         }
     }
 
-    private static void speakListNum(List<List<String>> remarks, int i){
+    private static void speakListNum(List<List<String>> remarks, int i){//specifically if some data is needed in a remark
             Random rand = new Random();
             int index = rand.nextInt(remarks.size());
             String start = remarks.get(index).get(0);
@@ -168,7 +188,7 @@ public class Sunny {
             System.out.println(start + (i - 1) + end);
     }
 
-    private static void speak(List<String> greetings) {
+    private static void speak(List<String> greetings) {//when a remark is given
             Random rand = new Random();
             int index = rand.nextInt(greetings.size());
             System.out.println(greetings.get(index));
