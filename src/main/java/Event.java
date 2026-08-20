@@ -7,6 +7,10 @@ public class Event extends Task {
         this.end = end;
     }
 
+    public String getFileFormat() {
+        return " | " + this.start + " | " + this.end + " | " + (this.isDone() ? "1" : "0");
+    }
+
     @Override
     public String toString() {
         return "[E]" + super.toString() + "(From: " + this.start + " to: " + this.end + ")";

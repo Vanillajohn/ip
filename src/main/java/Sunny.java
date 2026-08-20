@@ -2,8 +2,19 @@ import java.util.Random;
 import java.util.List;
 import java.util.Scanner;
 import java.util.ArrayList;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileNotFoundException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class Sunny {
+    private static final String FILE_PATH = "./data/Sunny'sAmazingTaskboard(ForHerBothersomeUser).txt";
+
         public static void main(String[] args) {
             // more specific error handling that tells user what to do
             // add comments to explain things
@@ -26,9 +37,11 @@ public class Sunny {
         List<String> notInteger = List.of("I need a VALID INTEGER doofus!", "You're in CS and you don't know what a VALID INTEGER is?");
 
         ArrayList<Task> tasks = new ArrayList<>(101);
-        int taskCount = 0;
-        Scanner scanner = new Scanner(System.in);//the scanner for user input
-        Random uniRand = new Random();//a random whenever something needs a random number
+        createDataDirectory();
+        loadTasks(tasks);
+        int taskCount = tasks.size();
+        Scanner scanner = new Scanner(System.in);
+        Random uniRand = new Random();
 
         System.out.println("____________________________________________________________");
         speak(greetings);
@@ -57,7 +70,7 @@ public class Sunny {
                         System.out.println("____________________________________________________________");
                         speak(listRemarks);
                         while (i < taskCount) {
-                            System.out.println(i + "." + tasks.get(i));
+                            System.out.println(i + 1 + "." + tasks.get(i));
                             i += 1;
                         }
                         System.out.println("____________________________________________________________");
@@ -70,6 +83,8 @@ public class Sunny {
                         int index1 = Integer.parseInt(parts[1]) - 1;
                         if (index1 >= 0 && index1 < tasks.size() && tasks.get(index1) != null){ //if tasks at index has something
                             tasks.get(index1).mark();
+                            saveTasks(tasks);
+
                             System.out.println("____________________________________________________________");
                             speak(taskMark);
                             System.out.println(index1 + "." + tasks.get(index1));
@@ -87,6 +102,8 @@ public class Sunny {
                         int index2 = Integer.parseInt(parts[1]) - 1;
                         if (index2 >= 0 && index2 < tasks.size() && tasks.get(index2) != null) {//if tasks at index has something
                             tasks.get(index2).unmark();
+                            saveTasks(tasks);
+
                             System.out.println("____________________________________________________________");
                             speak(taskUnmark);
                             System.out.println(index2 + "." + tasks.get(index2));
@@ -142,6 +159,8 @@ public class Sunny {
                             temp = tasks.get(index3);
                             tasks.remove(index3);
                             taskCount -= 1;
+                            saveTasks(tasks);
+
                             System.out.println("____________________________________________________________");
                             speak(deleting);
                             System.out.println("    " + temp);
@@ -159,6 +178,8 @@ public class Sunny {
                 }
                 tasks.add(temp);
                 taskCount += 1;
+                saveTasks(tasks);
+
                 System.out.println("____________________________________________________________");
                 speak(taskAddRemarks);
                 System.out.println("    " + temp);
@@ -192,5 +213,129 @@ public class Sunny {
             Random rand = new Random();
             int index = rand.nextInt(greetings.size());
             System.out.println(greetings.get(index));
+    }
+
+    private static void saveTasks(ArrayList<Task> tasks) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH))) {
+
+            for (Task task : tasks) {
+                writer.write(taskToFileFormat(task));
+                writer.newLine();
+            }
+            writer.close();
+        } catch (IOException e) {
+            System.out.println("Error saving tasks: " + e.getMessage());
+        }
+    }
+
+    private static String taskToFileFormat(Task task) {
+        if (task instanceof ToDo) {
+            return "T | " + task.getDesc() + " | " + (task.isDone() ? "1" : "0");
+        }
+        if (task instanceof Deadline deadline) {
+            return "D | " + deadline.getDesc() + deadline.getFileFormat();
+        }
+        if (task instanceof Event event) {
+            return "E | " + event.getDesc() + event.getFileFormat();
+        }
+
+        return "";
+    }
+
+    private static void loadTasks(ArrayList<Task> tasks) {
+        ArrayList<Task> loadedTasks = new ArrayList<>();
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH))) {
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+                Task task = taskFromFileFormat(line);
+                loadedTasks.add(task);
+            }
+            tasks.addAll(loadedTasks);// Only modify the real task list if the ENTIRE file was valid
+
+        } catch (FileNotFoundException e) {
+            // Fine to be empty on first time
+        } catch (IllegalArgumentException e) {
+            System.out.println("Data file is corrupted.");
+            System.out.println("Starting with an empty task list.");
+
+            deleteDataFile();
+        } catch (IOException e) {
+            System.out.println("Error reading data file: " + e.getMessage());
+        }
+    }
+
+    private static Task taskFromFileFormat(String line) {
+        String[] parts = line.split(" \\| ", -1);
+        if (parts.length == 0) {
+            throw new IllegalArgumentException("Empty task line");
+        }
+
+        String type = parts[0];
+        switch (type) {
+
+            case "T":
+                if (parts.length != 3) {
+                    throw new IllegalArgumentException("Invalid ToDo format");
+                }
+                if (!parts[2].equals("0") && !parts[2].equals("1")) {
+                    throw new IllegalArgumentException("Invalid completion status");
+                }
+                ToDo todo = new ToDo(parts[1]);
+
+                if (parts[2].equals("1")) {
+                    todo.mark();
+                }
+                return todo;
+
+            case "D":
+                if (parts.length != 4) {
+                    throw new IllegalArgumentException("Invalid Deadline format");
+                }
+                if (!parts[3].equals("0") && !parts[3].equals("1")) {
+                    throw new IllegalArgumentException("Invalid completion status");
+                }
+                Deadline deadline = new Deadline(parts[1], parts[2]);
+
+                if (parts[3].equals("1")) {
+                    deadline.mark();
+                }
+                return deadline;
+
+            case "E":
+                if (parts.length != 5) {
+                    throw new IllegalArgumentException("Invalid Event format");
+                }
+                if (!parts[4].equals("0") && !parts[4].equals("1")) {
+                    throw new IllegalArgumentException("Invalid completion status");
+                }
+                Event event = new Event(parts[1], parts[2], parts[3]);
+
+                if (parts[4].equals("1")) {
+                    event.mark();
+                }
+                return event;
+
+            default:
+                throw new IllegalArgumentException("Unknown task type");
+        }
+    }
+
+    private static void createDataDirectory() {
+        try {
+            Path dataDirectory = Paths.get("./data");
+            Files.createDirectories(dataDirectory);
+        } catch (IOException e) {
+            System.out.println("Could not create data directory.");
+        }
+    }
+
+    private static void deleteDataFile() {
+        try {
+            Files.deleteIfExists(Paths.get(FILE_PATH));
+        } catch (IOException e) {
+            System.out.println("Could not delete corrupted data file: " + e);
+        }
     }
 }
