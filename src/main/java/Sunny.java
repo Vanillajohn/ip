@@ -11,13 +11,29 @@ import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
+import java.util.Optional;
 
 public class Sunny {
     private static final String FILE_PATH = "./data/Sunny'sAmazingTaskboard(ForHerBothersomeUser).txt";
+    private static final DateTimeFormatter FLEXIBLE_FORMATTER = new DateTimeFormatterBuilder()
+            // 1. Handle the date part variants
+            .appendPattern("[dd/MM/yyyy][dd-MM-yyyy]")
+            // 2. Handle the optional space and time part
+            .appendPattern("[ HHmm]")
+            // 3. Fallback to midnight if the time pattern is missing
+            .parseDefaulting(ChronoField.HOUR_OF_DAY, 23)
+            .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 59)
+            .toFormatter();
 
         public static void main(String[] args) {
             // more specific error handling that tells user what to do
             // add comments to explain things
+            // find based on date
 
         List<String> greetings = List.of("Yeah, it's me, Sunny.\nWhat do you want?", "What now?\nCan you go bother someone else?");
         List<String> goodbyes = List.of("Don't tell anyone I helped you, got it?", "See you never.", "Jeez, you really depend on me, don't you?");
@@ -42,6 +58,7 @@ public class Sunny {
         int taskCount = tasks.size();
         Scanner scanner = new Scanner(System.in);
         Random uniRand = new Random();
+
 
         System.out.println("____________________________________________________________");
         speak(greetings);
@@ -130,8 +147,19 @@ public class Sunny {
                             int index = uniRand.nextInt(insufficient.size());
                             throw new insufficientInfoException(insufficient.get(index));
                         }
-                        temp = new Deadline(String.join(" ", input.substring(9, slashIndex)).trim(), input.substring(slashIndex + 3).trim());
-                        break;
+                        String description = String.join(" ", input.substring(9, slashIndex)).trim();
+
+                        Optional<LocalDateTime> dateOpt = dateParser(input.substring(slashIndex + 3).trim());
+
+                        if (dateOpt.isPresent()) {
+                            LocalDateTime actualDate = dateOpt.get();
+                            temp = new Deadline(description, actualDate, "");
+                            break;
+                        } else {
+                            temp = new Deadline(description, null, input.substring(slashIndex + 3).trim());
+                            break;
+                        }
+
                     case "event":
                         if (parts.length == 1){
                             int index = uniRand.nextInt(descEmpty.size());
@@ -144,11 +172,28 @@ public class Sunny {
                             throw new insufficientInfoException(insufficient.get(index));
                         }
                         String desc = input.substring(6, firstSlash);
-                        String start = input.substring(firstSlash + 5, secondSlash).trim();
-                        String end = input.substring(secondSlash + 3).trim();
+                        String startString = input.substring(firstSlash + 5, secondSlash).trim();
+                        String endString = input.substring(secondSlash + 3).trim();
+                        Optional<LocalDateTime> startOpt = dateParser(startString);
+                        Optional<LocalDateTime> endOpt = dateParser(endString);
 
-                        temp = new Event(desc, start, end);
-                        break;
+                        if (startOpt.isPresent() && endOpt.isPresent()) {
+                            LocalDateTime startActual = startOpt.get();
+                            LocalDateTime endActual = endOpt.get();
+                            temp = new Event(desc, startActual, endActual, "", "");
+                            break;
+                        } else if (startOpt.isPresent()) {
+                            LocalDateTime startActual = startOpt.get();
+                            temp = new Event(desc, startActual, null, "", endString);
+                            break;
+                        } else if (endOpt.isPresent()) {
+                            LocalDateTime endActual = endOpt.get();
+                            temp = new Event(desc, null, endActual, startString, "");
+                            break;
+                        } else {
+                            temp = new Event(desc, null, null, startString, endString);
+                            break;
+                        }
                     case "delete":
                         if (parts.length == 1){
                             int index = uniRand.nextInt(insufficient.size());
@@ -296,7 +341,16 @@ public class Sunny {
                 if (!parts[3].equals("0") && !parts[3].equals("1")) {
                     throw new IllegalArgumentException("Invalid completion status");
                 }
-                Deadline deadline = new Deadline(parts[1], parts[2]);
+                Deadline deadline = null;
+
+                Optional<LocalDateTime> dateOpt = dateParser(parts[2]);
+
+                if (dateOpt.isPresent()) {
+                    LocalDateTime actualDate = dateOpt.get();
+                    deadline = new Deadline(parts[1], actualDate, "");
+                } else {
+                    deadline = new Deadline(parts[1], null, parts[2]);
+                }
 
                 if (parts[3].equals("1")) {
                     deadline.mark();
@@ -310,7 +364,24 @@ public class Sunny {
                 if (!parts[4].equals("0") && !parts[4].equals("1")) {
                     throw new IllegalArgumentException("Invalid completion status");
                 }
-                Event event = new Event(parts[1], parts[2], parts[3]);
+                Event event = null;
+
+                Optional<LocalDateTime> startOpt = dateParser(parts[2]);
+                Optional<LocalDateTime> endOpt = dateParser(parts[3]);
+
+                if (startOpt.isPresent() && endOpt.isPresent()) {
+                    LocalDateTime startActual = startOpt.get();
+                    LocalDateTime endActual = endOpt.get();
+                    event = new Event(parts[1], startActual, endActual, "", "");
+                } else if (startOpt.isPresent()) {
+                    LocalDateTime startActual = startOpt.get();
+                    event = new Event(parts[1], startActual, null, "", parts[3]);
+                } else if (endOpt.isPresent()) {
+                    LocalDateTime endActual = endOpt.get();
+                    event = new Event(parts[1], null, endActual, parts[2], "");
+                } else {
+                    event = new Event(parts[1], null, null, parts[2], parts[3]);
+                }
 
                 if (parts[4].equals("1")) {
                     event.mark();
@@ -336,6 +407,17 @@ public class Sunny {
             Files.deleteIfExists(Paths.get(FILE_PATH));
         } catch (IOException e) {
             System.out.println("Could not delete corrupted data file: " + e);
+        }
+    }
+
+    private static Optional<LocalDateTime> dateParser(String inputDate){//dd/mm/yyyy, dd-mm-yyyy, either two with time
+        if (inputDate == null) {
+            throw new IllegalArgumentException("Input string cannot be null");
+        }
+        try {
+            return Optional.of(LocalDateTime.parse(inputDate.trim(), FLEXIBLE_FORMATTER));
+        } catch (Exception e) {
+            return Optional.empty(); // Not a date format
         }
     }
 }

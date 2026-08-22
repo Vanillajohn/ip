@@ -1,18 +1,41 @@
-public class Event extends Task {
-    protected String start, end;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
-    public Event (String desc, String start, String end) {
+public class Event extends Task {
+    protected LocalDateTime start, end;
+    protected String notStart, notEnd;
+    private final DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+
+    public Event (String desc, LocalDateTime start, LocalDateTime end, String notStart, String notEnd) {
         super(desc);
         this.start = start;
         this.end = end;
+        this.notStart = notStart;
+        this.notEnd = notEnd;
     }
 
     public String getFileFormat() {
-        return " | " + this.start + " | " + this.end + " | " + (this.isDone() ? "1" : "0");
+        if (this.notStart.equals("") && this.notEnd.equals("")){
+            return " | " + this.start.format(customFormatter) + " | " + this.end.format(customFormatter) + " | " + (this.isDone() ? "1" : "0");
+        } else if (this.notStart.equals("")) {
+            return " | " + this.notStart + " | " + this.end.format(customFormatter) + " | " + (this.isDone() ? "1" : "0");
+        } else if (this.notEnd.equals("")) {
+            return " | " + this.start.format(customFormatter) + " | " + this.notEnd + " | " + (this.isDone() ? "1" : "0");
+        } else {
+            return " | " + this.notStart + " | " + this.notEnd + " | " + (this.isDone() ? "1" : "0");
+        }
     }
 
     @Override
     public String toString() {
-        return "[E]" + super.toString() + "(From: " + this.start + " to: " + this.end + ")";
+        if (this.notStart.equals("") && this.notEnd.equals("")){
+            return "[E]" + super.toString() + "(From: " + this.start.format(customFormatter) + " to: " + this.end.format(customFormatter) + ")";
+        } else if (this.notStart.equals("")) {
+            return "[E]" + super.toString() + "(From: " + this.notStart + " to: " + this.end.format(customFormatter) + ")";
+        } else if (this.notEnd.equals("")) {
+            return "[E]" + super.toString() + "(From: " + this.start.format(customFormatter) + " to: " + this.notEnd + ")";
+        } else {
+            return "[E]" + super.toString() + "(From: " + this.notStart + " to: " + this.notEnd + ")";
+        }
     }
 }
