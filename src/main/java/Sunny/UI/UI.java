@@ -1,4 +1,11 @@
+package sunny.ui;
+
 import java.util.Scanner;
+import sunny.taskboard.Taskboard;
+import sunny.utility.UserParser;
+import sunny.SunnyVoice;
+import sunnyexception.*;
+import task.*;
 
 public class UI {
     private UI(){}

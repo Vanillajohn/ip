@@ -1,3 +1,5 @@
+package sunny;
+
 import java.util.List;
 import java.util.Random;
 
