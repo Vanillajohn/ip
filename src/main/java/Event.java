@@ -18,9 +18,9 @@ public class Event extends Task {
         if (this.notStart.equals("") && this.notEnd.equals("")){
             return " | " + this.start.format(customFormatter) + " | " + this.end.format(customFormatter) + " | " + (this.isDone() ? "1" : "0");
         } else if (this.notStart.equals("")) {
-            return " | " + this.notStart + " | " + this.end.format(customFormatter) + " | " + (this.isDone() ? "1" : "0");
-        } else if (this.notEnd.equals("")) {
             return " | " + this.start.format(customFormatter) + " | " + this.notEnd + " | " + (this.isDone() ? "1" : "0");
+        } else if (this.notEnd.equals("")) {
+            return " | " + this.notStart + " | " + this.end.format(customFormatter) + " | " + (this.isDone() ? "1" : "0");
         } else {
             return " | " + this.notStart + " | " + this.notEnd + " | " + (this.isDone() ? "1" : "0");
         }
@@ -31,9 +31,9 @@ public class Event extends Task {
         if (this.notStart.equals("") && this.notEnd.equals("")){
             return "[E]" + super.toString() + "(From: " + this.start.format(customFormatter) + " to: " + this.end.format(customFormatter) + ")";
         } else if (this.notStart.equals("")) {
-            return "[E]" + super.toString() + "(From: " + this.notStart + " to: " + this.end.format(customFormatter) + ")";
-        } else if (this.notEnd.equals("")) {
             return "[E]" + super.toString() + "(From: " + this.start.format(customFormatter) + " to: " + this.notEnd + ")";
+        } else if (this.notEnd.equals("")) {
+            return "[E]" + super.toString() + "(From: " + this.notStart + " to: " + this.end.format(customFormatter) + ")";
         } else {
             return "[E]" + super.toString() + "(From: " + this.notStart + " to: " + this.notEnd + ")";
         }
