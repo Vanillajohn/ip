@@ -7,11 +7,21 @@ import sunny.SunnyVoice;
 import sunnyexception.*;
 import task.*;
 
+/**
+ * Handles the interactions with the user.
+ * <p>This class follows the singleton pattern and can be accessed
+ * through {@link #getInstance()}.</p>
+ */
 public class UI {
     private UI(){}
     private static class holder{
         private static final UI INSTANCE = new UI();
     }
+    /**
+     * Returns the singleton instance of UI.
+     *
+     * @return the UI singleton instance
+     */
     public static UI getInstance(){
         return UI.holder.INSTANCE;
     }
@@ -21,6 +31,10 @@ public class UI {
     private UserParser userParser = UserParser.getInstance();
     boolean toggle = true;
 
+    /**
+     * Prints a goodbye remark and sets toggle to false, usually to exit the program
+     * by stopping run().
+     */
     public void goodbye(){
         System.out.println("____________________________________________________________");
         sunnyVoice.speak("goodbyes");
@@ -28,6 +42,11 @@ public class UI {
         toggle = false;
     }
 
+    /**
+     * Prints a listRemark and the tasks in the taskboard.
+     * The numbering is the order the tasks were added in.
+     * If there are none, it just prints the remark.
+     */
     public void list(){
         int i = 0;
         System.out.println("____________________________________________________________");
@@ -39,6 +58,11 @@ public class UI {
         System.out.println("____________________________________________________________");
     }
 
+    /**
+     * Prints a taskMark remark and the task selected by the index.
+     *
+     * @param index1 the index that selects the task to be marked.
+     */
     public void mark(int index1){
         System.out.println("____________________________________________________________");
         sunnyVoice.speak("taskMark");
@@ -46,6 +70,11 @@ public class UI {
         System.out.println("____________________________________________________________");
     }
 
+    /**
+     * Prints a taskUnmark remark and the task selected by the index.
+     *
+     * @param index2 the index that selects the task to be unmarked.
+     */
     public void unmark(int index2){
         System.out.println("____________________________________________________________");
         sunnyVoice.speak("taskUnmark");
@@ -53,6 +82,12 @@ public class UI {
         System.out.println("____________________________________________________________");
     }
 
+    /**
+     * Prints a deleting remark, the task selected by the index, a listNumberRemark and
+     * the number of tasks in the taskboard.
+     *
+     * @param temp the task to be deleted.
+     */
     public void delete(Task temp){
         System.out.println("____________________________________________________________");
         sunnyVoice.speak("deleting");
@@ -61,6 +96,12 @@ public class UI {
         System.out.println("____________________________________________________________");
     }
 
+    /**
+     * Prints a taskAddRemark, the task to be added, a listNumberRemark, the number of tasks
+     * in the taskboard, and a taskRemark.
+     *
+     * @param temp the task to be added to the taskboard.
+     */
     public void task(Task temp){
         System.out.println("____________________________________________________________");
         sunnyVoice.speak("taskAddRemarks");
@@ -70,6 +111,12 @@ public class UI {
         System.out.println("____________________________________________________________");
     }
 
+    /**
+     * Continuously reads user input and sends it to UserParser for processing until the UI is stopped.
+     * Handles exceptions resulting from invalid input.
+     *
+     * @param scanner a scanner inputted by a different class.
+     */
     public void run(Scanner scanner){
         while (toggle) {
             try{
@@ -96,6 +143,9 @@ public class UI {
         }
     }
 
+    /**
+     * Resets the class by setting toggle to true, thereby allowing run() to run.
+     */
     public void reset() {
         toggle = true;
     }
