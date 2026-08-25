@@ -5,7 +5,15 @@ import sunny.ui.UI;
 
 import java.util.Scanner;
 
+/**
+ * The main class that begins the program
+ */
 public class Sunny {
+        /**
+         * Runs the main program
+         *
+         * @param args command-line arguments passed to the program
+         */
         public static void main(String[] args) {
                 // more specific error handling that tells user what to do
                 // add comments to explain things

@@ -3,11 +3,25 @@ package task;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * A task that contains a description, a start date and end date.
+ * This class extends {@link Task}.
+ */
 public class Event extends Task {
     protected LocalDateTime start, end;
     protected String notStart, notEnd;
     private final DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
 
+    /**
+     * Constructs the task with the specific description, start and end dates.
+     * The start and end dates are represented by either a LocalDateTime object or a String, but not both.
+     *
+     * @param desc the task's description.
+     * @param start the start date as a LocalDateTime object, or null if it is stored as a String.
+     * @param end the end date as a LocalDateTime object, or null if it is stored as a String.
+     * @param notStart the start date as a String, or an empty String if it is stored as a LocalDateTime.
+     * @param notEnd the end date as a String, or an empty String if it is stored as a LocalDateTime.
+     */
     public Event (String desc, LocalDateTime start, LocalDateTime end, String notStart, String notEnd) {
         super(desc);
         this.start = start;
@@ -16,6 +30,13 @@ public class Event extends Task {
         this.notEnd = notEnd;
     }
 
+    /**
+     * Returns a String representation of the task to be written to a file for storage.
+     * Status is indicated as "1" for marked and "0" for unmarked.
+     *
+     * @return the task as a String in the format: "|start date|end date|status" where the start and end dates
+     * are in LocalDateTime formats or as Strings the task was created with.
+     */
     public String getFileFormat() {
         if (this.notStart.equals("") && this.notEnd.equals("")){
             return " | " + this.start.format(customFormatter) + " | " + this.end.format(customFormatter) + " | " + (this.isDone() ? "1" : "0");
@@ -28,6 +49,14 @@ public class Event extends Task {
         }
     }
 
+    /**
+     * Returns a string representation of the task consisting of its type, its status icon,
+     * its description, its start and end dates.
+     * Its start and end dates will either be formatted as a LocalDateTime object or as the Strings the
+     * task was created with.
+     *
+     * @return the task as a String in the format: "[E][status] description (From: start date to: end date".
+     */
     @Override
     public String toString() {
         if (this.notStart.equals("") && this.notEnd.equals("")){

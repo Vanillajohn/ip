@@ -3,11 +3,22 @@ package sunny;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Handles the "speaking" part of the chatbot.
+ * A remark is the text the chatbot would speak.
+ * <p>This class follows the singleton pattern and can be accessed
+ *  * through {@link #getInstance()}.</p>
+ */
 public class SunnyVoice {
     private SunnyVoice(){}
     private static class holder{
         private static final SunnyVoice INSTANCE = new SunnyVoice();
     }
+    /**
+     * Returns the singleton instance of SunnyVoice.
+     *
+     * @return the SunnyVoice singleton instance
+     */
     public static SunnyVoice getInstance(){
         return SunnyVoice.holder.INSTANCE;
     }
@@ -31,7 +42,14 @@ public class SunnyVoice {
 
     private Random rand = new Random();
 
-    public void speakListNum(String pool, int i){//specifically if some data is needed in a remark
+    /**
+     * Prints a remark that requires data in the form of an integer.
+     * Immediately prints as opposed to returning remarks as strings.
+     *
+     * @param pool the name of the List<String> remarks available above.
+     * @param i the integer required.
+     */
+    public void speakListNum(String pool, int i){
         int index;
         switch(pool){
             case "listNumberRemarks":
@@ -42,6 +60,12 @@ public class SunnyVoice {
         }
     }
 
+    /**
+     * Returns a list of exception remarks, usually because data is needed for the remark.
+     *
+     * @param pool the name of the List<String> remarks available above.
+     * @return a List<String> of exception remarks.
+     */
     public List<String> getListException (String pool){
         int index;
         switch (pool){
@@ -52,6 +76,12 @@ public class SunnyVoice {
         return null;
     }
 
+    /**
+     * Returns an exception remark.
+     *
+     * @param pool the name of the List<String> remarks available above.
+     * @return a String exception remark.
+     */
     public String getException(String pool){
         switch(pool){
             case "tooMany":
@@ -73,6 +103,12 @@ public class SunnyVoice {
         return text.get(index);
     }
 
+    /**
+     * Prints a remark based on the specified pool.
+     * Immediately prints as opposed to returning remarks as strings.
+     *
+     * @param pool the name of the List<String> remarks available above.
+     */
     public void speak(String pool) {//when a remark is given
         switch(pool) {
             case "greetings":
