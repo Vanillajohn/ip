@@ -19,11 +19,9 @@ public class UI {
     private Taskboard taskboard = Taskboard.getInstance();
     private SunnyVoice sunnyVoice = SunnyVoice.getInstance();
     private UserParser userParser = UserParser.getInstance();
-    Scanner scanner = new Scanner(System.in);
     boolean toggle = true;
 
     public void goodbye(){
-        scanner.close();
         System.out.println("____________________________________________________________");
         sunnyVoice.speak("goodbyes");
         System.out.println("____________________________________________________________");
@@ -72,7 +70,7 @@ public class UI {
         System.out.println("____________________________________________________________");
     }
 
-    public void run(){
+    public void run(Scanner scanner){
         while (toggle) {
             try{
                 if (taskboard.getTaskCount() == 101){
@@ -96,6 +94,10 @@ public class UI {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    public void reset() {
+        toggle = true;
     }
 
 }

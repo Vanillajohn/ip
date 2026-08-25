@@ -28,7 +28,7 @@ public class Taskboard {
     }
     public void setTaskCount(int value) {
         taskCount += value;
-    }
+    }//change to update
     public Task getTask(int index){
         return tasks.get(index);
     }
@@ -40,5 +40,9 @@ public class Taskboard {
     }
     public ArrayList<Task> getTasks(){
         return tasks;
+    }
+    public void clearTasks() {
+        tasks.clear();
+        taskCount = 0;
     }
 }
