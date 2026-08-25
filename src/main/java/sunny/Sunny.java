@@ -1,9 +1,9 @@
 package sunny;
 
+import java.util.Scanner;
+
 import sunny.taskboard.Taskboard;
 import sunny.ui.UI;
-
-import java.util.Scanner;
 
 public class Sunny {
         public static void main(String[] args) {

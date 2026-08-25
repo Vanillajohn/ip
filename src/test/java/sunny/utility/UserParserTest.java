@@ -1,7 +1,13 @@
 package sunny.utility;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import sunny.taskboard.Taskboard;
 import sunny.ui.UI;
 import sunnyexception.SunnyException;
@@ -11,8 +17,6 @@ import sunnyexception.taskOutOfBoundsException;
 import task.Deadline;
 import task.Task;
 import task.ToDo;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 public class UserParserTest {
     private UI ui = UI.getInstance();
