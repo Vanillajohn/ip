@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import org.junit.jupiter.api.AfterEach;
@@ -162,5 +163,26 @@ public class UITest {
         );
 
         assertFalse(taskboard.getTask(0).isDone());
+    }
+
+    @Test
+    void find_printsTasks() {
+        // Arrange
+        ArrayList<Task> foundTasks = new ArrayList<>();
+
+        Task task1 = new Task("Buy milk");
+        Task task2 = new Task("Do homework");
+
+        foundTasks.add(task1);
+        foundTasks.add(task2);
+
+        System.setOut(new PrintStream(output));
+
+        ui.find(foundTasks);
+
+        String printedOutput = output.toString();
+
+        assertTrue(printedOutput.contains("Buy milk"));
+        assertTrue(printedOutput.contains("Do homework"));
     }
 }

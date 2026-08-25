@@ -39,6 +39,8 @@ public class SunnyVoice {
     List<String> deleting = List.of("If you want this deleted, why did you add it?", "I've added it and now you want me to remove it?", "Now I'm DELETING for you too?");
     List<String> missingTask = List.of("There's no task there!", "I ain't doing anything if nothing's there!");
     List<String> notInteger = List.of("I need a VALID INTEGER doofus!", "You're in CS and you don't know what a VALID INTEGER is?");
+    List<String> tooManyKeywords = List.of("If you've got more than one keyword, search it yourself!", "I'll tolerate at most one keyword!");
+    List<String> foundTasks = List.of("Here's the tasks you want. I should remove them while you're not looking.", "Found these so far. Am I your butler or something?");
 
     private Random rand = new Random();
 
@@ -94,6 +96,8 @@ public class SunnyVoice {
                 return getExceptionHelper(unrecognised);
             case "notInteger":
                 return getExceptionHelper(notInteger);
+            case "tooManyKeywords":
+                return getExceptionHelper(tooManyKeywords);
         }
         return null;
     }
@@ -137,6 +141,9 @@ public class SunnyVoice {
                 break;
             case "notInteger":
                 speakHelper(notInteger);
+                break;
+            case "foundTasks":
+                speakHelper(foundTasks);
                 break;
         }
     }

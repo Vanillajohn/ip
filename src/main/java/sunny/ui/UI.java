@@ -1,5 +1,6 @@
 package sunny.ui;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import sunny.SunnyVoice;
@@ -10,6 +11,8 @@ import sunnyexception.TaskEmptyDescException;
 import sunnyexception.UnrecognisedTaskException;
 import sunnyexception.insufficientInfoException;
 import sunnyexception.taskOutOfBoundsException;
+
+import sunnyexception.tooManyKeywordsException;
 import sunnyexception.tooManyTasksException;
 import task.Task;
 
@@ -118,6 +121,22 @@ public class UI {
     }
 
     /**
+     * Prints the tasks with a specific keyword entered.
+     *
+     * @param foundTask the tasks that contain the keyword.
+     */
+    public void find(ArrayList<Task> foundTask){
+        int i = 0;
+        System.out.println("____________________________________________________________");
+        sunnyVoice.speak("foundTasks");
+        while (i < foundTask.size()) {
+            System.out.println(i + 1 + "." + foundTask.get(i));
+            i += 1;
+        }
+        System.out.println("____________________________________________________________");
+    }
+
+    /**
      * Continuously reads user input and sends it to UserParser for processing until the UI is stopped.
      * Handles exceptions resulting from invalid input.
      *
@@ -133,7 +152,7 @@ public class UI {
 
                 userParser.userParse(input, this);
             }
-            catch (UnrecognisedTaskException | TaskEmptyDescException | insufficientInfoException | tooManyTasksException | taskOutOfBoundsException e) {
+            catch (UnrecognisedTaskException | TaskEmptyDescException | insufficientInfoException | tooManyTasksException | taskOutOfBoundsException | tooManyKeywordsException e) {
                 System.out.println("____________________________________________________________");
                 System.out.println(e.getMessage());
                 System.out.println("____________________________________________________________");
