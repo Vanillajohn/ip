@@ -3,6 +3,7 @@ package sunny.utility;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.ResolverStyle;
 import java.time.temporal.ChronoField;
 import java.util.Optional;
 
@@ -17,13 +18,14 @@ public class dateParser{
     }
     private static final DateTimeFormatter FLEXIBLE_FORMATTER = new DateTimeFormatterBuilder()
             // 1. Handle the date part variants
-            .appendPattern("[dd/MM/yyyy][dd-MM-yyyy]")
+            .appendPattern("[dd/MM/uuuu][dd-MM-uuuu]")
             // 2. Handle the optional space and time part
             .appendPattern("[ HHmm]")
             // 3. Fallback to midnight if the time pattern is missing
             .parseDefaulting(ChronoField.HOUR_OF_DAY, 23)
             .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 59)
-            .toFormatter();
+            .toFormatter()
+            .withResolverStyle(ResolverStyle.STRICT);
 
     public Optional<LocalDateTime> parse(String inputDate){//dd/mm/yyyy, dd-mm-yyyy, either two with time
         if (inputDate == null) {
@@ -35,5 +37,4 @@ public class dateParser{
             return Optional.empty(); // Not a date format
         }
     }
-
 }

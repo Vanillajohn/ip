@@ -19,7 +19,7 @@ public class Storage {
         return holder.INSTANCE;
     }
 
-    private static final String FILE_PATH = "./data/Sunny'sAmazingTaskboard(ForHerBothersomeUser).txt";
+    private static String FILE_PATH = "./data/Sunny'sAmazingTaskboard(ForHerBothersomeUser).txt";
     static dateParser parser = dateParser.getInstance();
 
     public void saveTasks(ArrayList<Task> tasks) {
@@ -170,5 +170,9 @@ public class Storage {
         } catch (IOException e) {
             System.out.println("Could not delete corrupted data file: " + e);
         }
+    }
+
+    public void setFilePath(String filePath) {
+        FILE_PATH = filePath;
     }
 }
