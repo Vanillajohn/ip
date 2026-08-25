@@ -1,18 +1,26 @@
 package sunny.utility;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import sunny.taskboard.Taskboard;
 import sunny.ui.UI;
 import sunnyexception.SunnyException;
 import sunnyexception.TaskEmptyDescException;
 import sunnyexception.insufficientInfoException;
 import sunnyexception.taskOutOfBoundsException;
+import sunnyexception.tooManyKeywordsException;
 import task.Deadline;
 import task.Task;
 import task.ToDo;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 public class UserParserTest {
     private UI ui = UI.getInstance();
@@ -22,7 +30,6 @@ public class UserParserTest {
         Taskboard taskboard = Taskboard.getInstance();
         taskboard.clearTasks();
     }
-
 
     @Test
     public void todoWithoutDescriptionThrowsException() {
@@ -157,5 +164,50 @@ public class UserParserTest {
 
         assertTrue(task instanceof Deadline);
         assertEquals("submit report", task.getDesc());
+    }
+
+    @Test
+    void userParse_findWithoutKeyword_throwsException() {
+        UserParser parser = UserParser.getInstance();
+
+        assertThrows(insufficientInfoException.class, () -> {
+            parser.userParse("find", ui);
+        });
+    }
+
+    @Test
+    void userParse_findWithTooManyKeywords_throwsException() {
+        UserParser parser = UserParser.getInstance();
+
+        assertThrows(tooManyKeywordsException.class, () -> {
+            parser.userParse("find homework tomorrow", ui);
+        });
+    }
+
+    @Test
+    void userParse_findMatchingTasks() throws SunnyException {
+        UserParser parser = UserParser.getInstance();
+        Taskboard taskboard = Taskboard.getInstance();
+
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        PrintStream originalOut = System.out;
+        System.setOut(new PrintStream(output));
+
+        Task task1 = new Task("Buy milk");
+        Task task2 = new Task("Do homework");
+        Task task3 = new Task("Buy groceries");
+
+        taskboard.addTask(task1);
+        taskboard.addTask(task2);
+        taskboard.addTask(task3);
+
+        parser.userParse("find Buy", ui);
+
+        System.setOut(originalOut);
+
+        String result = output.toString();
+
+        assertTrue(result.contains("Buy milk"));
+        assertTrue(result.contains("Buy groceries"));
     }
 }

@@ -1,8 +1,9 @@
 package sunny.taskboard;
 
 import java.util.ArrayList;
+
 import sunny.storage.Storage;
-import task.*;
+import task.Task;
 
 public class Taskboard {
     private Taskboard(){}

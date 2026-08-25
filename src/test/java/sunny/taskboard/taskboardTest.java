@@ -1,11 +1,14 @@
 package sunny.taskboard;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import task.Task;
 import task.ToDo;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 public class taskboardTest {
     private Taskboard taskboard = Taskboard.getInstance();

@@ -1,11 +1,19 @@
 package sunny.ui;
 
+import java.util.ArrayList;
 import java.util.Scanner;
+
+import sunny.SunnyVoice;
 import sunny.taskboard.Taskboard;
 import sunny.utility.UserParser;
-import sunny.SunnyVoice;
-import sunnyexception.*;
-import task.*;
+import sunnyexception.SunnyException;
+import sunnyexception.TaskEmptyDescException;
+import sunnyexception.UnrecognisedTaskException;
+import sunnyexception.insufficientInfoException;
+import sunnyexception.taskOutOfBoundsException;
+import sunnyexception.tooManyKeywordsException;
+import sunnyexception.tooManyTasksException;
+import task.Task;
 
 public class UI {
     private UI(){}
@@ -70,6 +78,22 @@ public class UI {
         System.out.println("____________________________________________________________");
     }
 
+    /**
+     * Prints the tasks with a specific keyword entered.
+     *
+     * @param foundTask the tasks that contain the keyword.
+     */
+    public void find(ArrayList<Task> foundTask){
+        int i = 0;
+        System.out.println("____________________________________________________________");
+        sunnyVoice.speak("foundTasks");
+        while (i < foundTask.size()) {
+            System.out.println(i + 1 + "." + foundTask.get(i));
+            i += 1;
+        }
+        System.out.println("____________________________________________________________");
+    }
+
     public void run(Scanner scanner){
         while (toggle) {
             try{
@@ -80,7 +104,7 @@ public class UI {
 
                 userParser.userParse(input, this);
             }
-            catch (UnrecognisedTaskException | TaskEmptyDescException | insufficientInfoException | tooManyTasksException | taskOutOfBoundsException e) {
+            catch (UnrecognisedTaskException | TaskEmptyDescException | insufficientInfoException | tooManyTasksException | taskOutOfBoundsException | tooManyKeywordsException e) {
                 System.out.println("____________________________________________________________");
                 System.out.println(e.getMessage());
                 System.out.println("____________________________________________________________");

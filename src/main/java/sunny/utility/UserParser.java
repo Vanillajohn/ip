@@ -1,13 +1,23 @@
 package sunny.utility;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Optional;
+
+import sunny.SunnyVoice;
 import sunny.storage.Storage;
 import sunny.taskboard.Taskboard;
-import sunny.SunnyVoice;
 import sunny.ui.UI;
-import sunnyexception.*;
-import task.*;
+import sunnyexception.SunnyException;
+import sunnyexception.TaskEmptyDescException;
+import sunnyexception.UnrecognisedTaskException;
+import sunnyexception.insufficientInfoException;
+import sunnyexception.taskOutOfBoundsException;
+import sunnyexception.tooManyKeywordsException;
+import task.Deadline;
+import task.Event;
+import task.Task;
+import task.ToDo;
 
 public class UserParser {
     private UserParser(){}
@@ -137,6 +147,23 @@ public class UserParser {
                 } else {//if there's nothing at index, either null or out of bounds
                     throw new taskOutOfBoundsException(sunnyVoice.getException("missingTask"));
                 }
+            case "find":
+                if (parts.length == 1){
+                throw new insufficientInfoException(sunnyVoice.getException("insufficient"));
+                }
+                if (parts.length > 2){
+                    throw new tooManyKeywordsException(sunnyVoice.getException("tooManyKeywords"));
+                }
+                String keyword = parts[1];
+                ArrayList<Task> foundTasks = new ArrayList<>();
+                for (Task task : taskboard.getTasks()){
+                    if (task.getDesc().contains(keyword)){
+                        foundTasks.add(task);
+                    }
+                }
+
+                ui.find(foundTasks);
+                return;
         }
         if (temp == null) {
             throw new UnrecognisedTaskException(sunnyVoice.getException("unrecognised"));

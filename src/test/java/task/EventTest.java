@@ -1,13 +1,13 @@
 package task;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
 public class EventTest {
     private static final DateTimeFormatter FLEXIBLE_FORMATTER = new DateTimeFormatterBuilder().appendPattern("[dd/MM/yyyy][dd-MM-yyyy]")
