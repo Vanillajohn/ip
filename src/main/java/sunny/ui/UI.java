@@ -1,11 +1,17 @@
 package sunny.ui;
 
 import java.util.Scanner;
+
+import sunny.SunnyVoice;
 import sunny.taskboard.Taskboard;
 import sunny.utility.UserParser;
-import sunny.SunnyVoice;
-import sunnyexception.*;
-import task.*;
+import sunnyexception.SunnyException;
+import sunnyexception.TaskEmptyDescException;
+import sunnyexception.UnrecognisedTaskException;
+import sunnyexception.insufficientInfoException;
+import sunnyexception.taskOutOfBoundsException;
+import sunnyexception.tooManyTasksException;
+import task.Task;
 
 /**
  * Handles the interactions with the user.

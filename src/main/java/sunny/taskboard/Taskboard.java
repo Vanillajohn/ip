@@ -1,8 +1,9 @@
 package sunny.taskboard;
 
 import java.util.ArrayList;
+
 import sunny.storage.Storage;
-import task.*;
+import task.Task;
 
 /**
  * Handles the operations of the taskboard and its associated tasks.
