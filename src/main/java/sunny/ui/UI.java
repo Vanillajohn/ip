@@ -86,7 +86,7 @@ public class UI {
      * @param index the index that selects the task to be marked.
      */
     public void replyMark(int index) {
-        lastResponse = sunnyVoice.getText("taskMark") + "\n" + index + "." + taskboard.getTask(index);
+        lastResponse = sunnyVoice.getText("taskMark") + "\n" + (index + 1) + "." + taskboard.getTask(index);
         System.out.println("____________________________________________________________");
         sunnyVoice.speak("taskMark");
         System.out.println(index + "." + taskboard.getTask(index));
@@ -99,7 +99,7 @@ public class UI {
      * @param index the index that selects the task to be unmarked.
      */
     public void replyUnmark(int index) {
-        lastResponse = sunnyVoice.getText("taskUnmark") + "\n" + index + "." + taskboard.getTask(index);
+        lastResponse = sunnyVoice.getText("taskUnmark") + "\n" + (index + 1) + "." + taskboard.getTask(index);
         System.out.println("____________________________________________________________");
         sunnyVoice.speak("taskUnmark");
         System.out.println(index + "." + taskboard.getTask(index));
@@ -108,7 +108,7 @@ public class UI {
 
     public void replyAlreadyDone(String task, int index) {
         List<String> remarks = sunnyVoice.getAlreadyDoneRemarks();
-        lastResponse = remarks.get(0) + task + remarks.get(1) + "\n" + index + "." + taskboard.getTask(index);
+        lastResponse = remarks.get(0) + task + remarks.get(1) + "\n" + (index + 1) + "." + taskboard.getTask(index);
         System.out.println("____________________________________________________________");
         sunnyVoice.speak("alreadyDone");
         System.out.println(index + "." + taskboard.getTask(index));
