@@ -15,9 +15,9 @@ import sunny.taskboard.Taskboard;
 import sunny.ui.UI;
 import sunnyexception.SunnyException;
 import sunnyexception.TaskEmptyDescException;
-import sunnyexception.insufficientInfoException;
-import sunnyexception.taskOutOfBoundsException;
-import sunnyexception.tooManyKeywordsException;
+import sunnyexception.InsufficientInfoException;
+import sunnyexception.TaskOutOfBoundsException;
+import sunnyexception.TooManyKeywordsException;
 import task.Deadline;
 import task.Task;
 import task.ToDo;
@@ -37,7 +37,7 @@ public class UserParserTest {
 
         assertThrows(
                 TaskEmptyDescException.class,
-                () -> parser.userParse("todo", ui)
+                () -> parser.parseUserInput("todo", ui)
         );
     }
 
@@ -47,11 +47,11 @@ public class UserParserTest {
 
         assertThrows(
                 TaskEmptyDescException.class,
-                () -> parser.userParse("deadline", ui)
+                () -> parser.parseUserInput("deadline", ui)
         );
         assertThrows(
-                insufficientInfoException.class,
-                () -> parser.userParse("deadline submit report", ui)
+                InsufficientInfoException.class,
+                () -> parser.parseUserInput("deadline submit report", ui)
         );
     }
 
@@ -61,11 +61,11 @@ public class UserParserTest {
 
         assertThrows(
                 TaskEmptyDescException.class,
-                () -> parser.userParse("event", ui)
+                () -> parser.parseUserInput("event", ui)
         );
         assertThrows(
-                insufficientInfoException.class,
-                () -> parser.userParse("event meeting", ui)
+                InsufficientInfoException.class,
+                () -> parser.parseUserInput("event meeting", ui)
         );
     }
 
@@ -76,7 +76,7 @@ public class UserParserTest {
 
         int originalCount = taskboard.getTaskCount();
 
-        parser.userParse("todo buy milk", ui);
+        parser.parseUserInput("todo buy milk", ui);
 
         assertEquals(originalCount + 1, taskboard.getTaskCount());
 
@@ -93,9 +93,9 @@ public class UserParserTest {
 
         Task task = new ToDo("buy milk");
         taskboard.addTask(task);
-        taskboard.setTaskCount(1);
+        taskboard.updateTaskCount(1);
 
-        parser.userParse("mark 1", ui);
+        parser.parseUserInput("mark 1", ui);
 
         assertTrue(taskboard.getTask(0).isDone());
     }
@@ -109,9 +109,9 @@ public class UserParserTest {
         task.mark();
 
         taskboard.addTask(task);
-        taskboard.setTaskCount(1);
+        taskboard.updateTaskCount(1);
 
-        parser.userParse("unmark 1", ui);
+        parser.parseUserInput("unmark 1", ui);
 
         assertFalse(taskboard.getTask(0).isDone());
     }
@@ -121,8 +121,8 @@ public class UserParserTest {
         UserParser parser = UserParser.getInstance();
 
         assertThrows(
-                taskOutOfBoundsException.class,
-                () -> parser.userParse("mark 999", ui)
+                TaskOutOfBoundsException.class,
+                () -> parser.parseUserInput("mark 999", ui)
         );
     }
 
@@ -131,8 +131,8 @@ public class UserParserTest {
         UserParser parser = UserParser.getInstance();
 
         assertThrows(
-                taskOutOfBoundsException.class,
-                () -> parser.userParse("delete 999", ui)
+                TaskOutOfBoundsException.class,
+                () -> parser.parseUserInput("delete 999", ui)
         );
     }
 
@@ -142,7 +142,7 @@ public class UserParserTest {
 
         assertThrows(
                 NumberFormatException.class,
-                () -> parser.userParse("mark banana", ui)
+                () -> parser.parseUserInput("mark banana", ui)
         );
     }
 
@@ -153,7 +153,7 @@ public class UserParserTest {
 
         int originalCount = taskboard.getTaskCount();
 
-        parser.userParse(
+        parser.parseUserInput(
                 "deadline submit report /by 24/08/2026",
                 ui
         );
@@ -167,25 +167,25 @@ public class UserParserTest {
     }
 
     @Test
-    void userParse_findWithoutKeyword_throwsException() {
+    void parseUserInput_findWithoutKeyword_throwsException() {
         UserParser parser = UserParser.getInstance();
 
-        assertThrows(insufficientInfoException.class, () -> {
-            parser.userParse("find", ui);
+        assertThrows(InsufficientInfoException.class, () -> {
+            parser.parseUserInput("find", ui);
         });
     }
 
     @Test
-    void userParse_findWithTooManyKeywords_throwsException() {
+    void parseUserInput_findWithTooManyKeywords_throwsException() {
         UserParser parser = UserParser.getInstance();
 
-        assertThrows(tooManyKeywordsException.class, () -> {
-            parser.userParse("find homework tomorrow", ui);
+        assertThrows(TooManyKeywordsException.class, () -> {
+            parser.parseUserInput("find homework tomorrow", ui);
         });
     }
 
     @Test
-    void userParse_findMatchingTasks() throws SunnyException {
+    void parseUserInput_findMatchingTasks() throws SunnyException {
         UserParser parser = UserParser.getInstance();
         Taskboard taskboard = Taskboard.getInstance();
 
@@ -201,7 +201,7 @@ public class UserParserTest {
         taskboard.addTask(task2);
         taskboard.addTask(task3);
 
-        parser.userParse("find Buy", ui);
+        parser.parseUserInput("find Buy", ui);
 
         System.setOut(originalOut);
 

@@ -4,7 +4,7 @@ package task;
  * Represents a general task with a description and completion status.
  * This class serves as the parent class for other task types.
  */
-public class Task{
+public class Task {
     protected String desc;
     protected boolean marked;
 

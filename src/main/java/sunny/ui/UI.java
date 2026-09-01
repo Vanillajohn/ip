@@ -1,6 +1,7 @@
 package sunny.ui;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import sunny.SunnyVoice;
@@ -9,11 +10,11 @@ import sunny.utility.UserParser;
 import sunnyexception.SunnyException;
 import sunnyexception.TaskEmptyDescException;
 import sunnyexception.UnrecognisedTaskException;
-import sunnyexception.insufficientInfoException;
-import sunnyexception.taskOutOfBoundsException;
+import sunnyexception.InsufficientInfoException;
+import sunnyexception.TaskOutOfBoundsException;
 
-import sunnyexception.tooManyKeywordsException;
-import sunnyexception.tooManyTasksException;
+import sunnyexception.TooManyKeywordsException;
+import sunnyexception.TooManyTasksException;
 import task.Task;
 
 /**
@@ -23,7 +24,7 @@ import task.Task;
  */
 public class UI {
     private UI(){}
-    private static class holder{
+    private static class Holder {
         private static final UI INSTANCE = new UI();
     }
     /**
@@ -32,23 +33,25 @@ public class UI {
      * @return the UI singleton instance
      */
     public static UI getInstance(){
-        return UI.holder.INSTANCE;
+        return Holder.INSTANCE;
     }
 
     private Taskboard taskboard = Taskboard.getInstance();
     private SunnyVoice sunnyVoice = SunnyVoice.getInstance();
     private UserParser userParser = UserParser.getInstance();
-    boolean toggle = true;
+    boolean isRunning = true;
+    private String lastResponse;
 
     /**
-     * Prints a goodbye remark and sets toggle to false, usually to exit the program
+     * Prints a goodbye remark and sets isRunning to false, usually to exit the program
      * by stopping run().
      */
-    public void goodbye(){
+    public void replyGoodbye() {
+        lastResponse = sunnyVoice.getText("goodbyes");
         System.out.println("____________________________________________________________");
         sunnyVoice.speak("goodbyes");
         System.out.println("____________________________________________________________");
-        toggle = false;
+        isRunning = false;
     }
 
     /**
@@ -56,38 +59,59 @@ public class UI {
      * The numbering is the order the tasks were added in.
      * If there are none, it just prints the remark.
      */
-    public void list(){
-        int i = 0;
-        System.out.println("____________________________________________________________");
-        sunnyVoice.speak("listRemarks");
-        while (i < taskboard.getTaskCount()) {
-            System.out.println(i + 1 + "." + taskboard.getTask(i));
-            i += 1;
+    public void replyList() {
+        if (taskboard.getTaskCount() == 0) {
+            System.out.println("____________________________________________________________");
+            sunnyVoice.speak("noList");
+            System.out.println("____________________________________________________________");
+            lastResponse = sunnyVoice.getText("noList");
+        } else {
+            String response = "";
+            int i = 0;
+            while (i < taskboard.getTaskCount()) {
+                System.out.println(i + 1 + "." + taskboard.getTask(i));
+                response += i + 1 + "." + taskboard.getTask(i) + "\n";
+                i += 1;
+            }
+            System.out.println("____________________________________________________________");
+            sunnyVoice.speak("listRemarks");
+            System.out.println("____________________________________________________________");
+            lastResponse = sunnyVoice.getText("listRemarks") + "\n" + response;
         }
-        System.out.println("____________________________________________________________");
     }
 
     /**
      * Prints a taskMark remark and the task selected by the index.
      *
-     * @param index1 the index that selects the task to be marked.
+     * @param index the index that selects the task to be marked.
      */
-    public void mark(int index1){
+    public void replyMark(int index) {
+        lastResponse = sunnyVoice.getText("taskMark") + "\n" + index + "." + taskboard.getTask(index);
         System.out.println("____________________________________________________________");
         sunnyVoice.speak("taskMark");
-        System.out.println(index1 + "." + taskboard.getTask(index1));
+        System.out.println(index + "." + taskboard.getTask(index));
         System.out.println("____________________________________________________________");
     }
 
     /**
      * Prints a taskUnmark remark and the task selected by the index.
      *
-     * @param index2 the index that selects the task to be unmarked.
+     * @param index the index that selects the task to be unmarked.
      */
-    public void unmark(int index2){
+    public void replyUnmark(int index) {
+        lastResponse = sunnyVoice.getText("taskUnmark") + "\n" + index + "." + taskboard.getTask(index);
         System.out.println("____________________________________________________________");
         sunnyVoice.speak("taskUnmark");
-        System.out.println(index2 + "." + taskboard.getTask(index2));
+        System.out.println(index + "." + taskboard.getTask(index));
+        System.out.println("____________________________________________________________");
+    }
+
+    public void replyAlreadyDone(String task, int index) {
+        List<String> remarks = sunnyVoice.getAlreadyDoneRemarks();
+        lastResponse = remarks.get(0) + task + remarks.get(1) + "\n" + index + "." + taskboard.getTask(index);
+        System.out.println("____________________________________________________________");
+        sunnyVoice.speak("alreadyDone");
+        System.out.println(index + "." + taskboard.getTask(index));
         System.out.println("____________________________________________________________");
     }
 
@@ -97,12 +121,23 @@ public class UI {
      *
      * @param temp the task to be deleted.
      */
-    public void delete(Task temp){
-        System.out.println("____________________________________________________________");
-        sunnyVoice.speak("deleting");
-        System.out.println("    " + temp);
-        sunnyVoice.speakListNum("listNumberRemarks", taskboard.getTaskCount() + 1);
-        System.out.println("____________________________________________________________");
+    public void replyDelete(Task temp) {
+        if (taskboard.getTaskCount() == 0) {
+            lastResponse = sunnyVoice.getText("deleting") + "\n" + "    " + temp + "\n" + sunnyVoice.getText("noTasksLeft");
+            System.out.println("____________________________________________________________");
+            sunnyVoice.speak("deleting");
+            System.out.println("    " + temp);
+            sunnyVoice.speak("noTasksLeft");
+            System.out.println("____________________________________________________________");
+        } else {
+            List<String> remarks = sunnyVoice.getlistNumberRemarks();
+            lastResponse = sunnyVoice.getText("deleting") + "\n" + "    " + temp + "\n" + remarks.get(0) + taskboard.getTaskCount() + remarks.get(1);
+            System.out.println("____________________________________________________________");
+            sunnyVoice.speak("deleting");
+            System.out.println("    " + temp);
+            System.out.println(remarks.get(0) + taskboard.getTaskCount() + remarks.get(1));
+            System.out.println("____________________________________________________________");
+        }
     }
 
     /**
@@ -111,11 +146,13 @@ public class UI {
      *
      * @param temp the task to be added to the taskboard.
      */
-    public void task(Task temp){
+    public void replyTask(Task temp) {
+        List<String> remarks = sunnyVoice.getlistNumberRemarks();
+        lastResponse = sunnyVoice.getText("taskAddRemarks") + "\n" + "    " + temp + "\n" + remarks.get(0) + taskboard.getTaskCount() + remarks.get(1);
         System.out.println("____________________________________________________________");
         sunnyVoice.speak("taskAddRemarks");
         System.out.println("    " + temp);
-        sunnyVoice.speakListNum("listNumberRemarks", taskboard.getTaskCount() + 1);
+        System.out.println(remarks.get(0) + taskboard.getTaskCount() + remarks.get(1));
         sunnyVoice.speak("taskRemarks");
         System.out.println("____________________________________________________________");
     }
@@ -125,15 +162,25 @@ public class UI {
      *
      * @param foundTask the tasks that contain the keyword.
      */
-    public void find(ArrayList<Task> foundTask){
+    public void replyFind(ArrayList<Task> foundTask) {
+        String response = "";
         int i = 0;
-        System.out.println("____________________________________________________________");
-        sunnyVoice.speak("foundTasks");
         while (i < foundTask.size()) {
             System.out.println(i + 1 + "." + foundTask.get(i));
+            response += i + 1 + "." + foundTask.get(i) + "\n";
             i += 1;
         }
-        System.out.println("____________________________________________________________");
+        if (response.isEmpty()) {
+            System.out.println("____________________________________________________________");
+            sunnyVoice.speak("noFoundTasks");
+            System.out.println("____________________________________________________________");
+            lastResponse = sunnyVoice.getText("noFoundTasks");
+        } else {
+            System.out.println("____________________________________________________________");
+            sunnyVoice.speak("foundTasks");
+            System.out.println("____________________________________________________________");
+            lastResponse = sunnyVoice.getText("foundTasks") + "\n" + response;
+        }
     }
 
     /**
@@ -142,25 +189,29 @@ public class UI {
      *
      * @param scanner a scanner inputted by a different class.
      */
-    public void run(Scanner scanner){
-        while (toggle) {
+    public void run(Scanner scanner) {
+        while (isRunning) {
             try{
                 if (taskboard.getTaskCount() == 101){
-                    throw new tooManyTasksException(sunnyVoice.getException("tooMany"));
+                    throw new TooManyTasksException(sunnyVoice.getException("tooMany"));
                 }
                 String input = scanner.nextLine();
 
-                userParser.userParse(input, this);
+                userParser.parseUserInput(input, this);
             }
-            catch (UnrecognisedTaskException | TaskEmptyDescException | insufficientInfoException | tooManyTasksException | taskOutOfBoundsException | tooManyKeywordsException e) {
+            catch (UnrecognisedTaskException | TaskEmptyDescException | InsufficientInfoException |
+                   TooManyTasksException |
+                   TaskOutOfBoundsException | TooManyKeywordsException e) {
                 System.out.println("____________________________________________________________");
                 System.out.println(e.getMessage());
                 System.out.println("____________________________________________________________");
+                lastResponse = e.getMessage();
             }
             catch (NumberFormatException e) { //if something other than an integer was used, or the integer is too large/small
                 System.out.println("____________________________________________________________");
                 sunnyVoice.speak("notInteger");
                 System.out.println("____________________________________________________________");
+                lastResponse = sunnyVoice.getText("notInteger");
             } //no catch for out of bounds to see if code was the issue rather than user
             catch (SunnyException e) {
                 throw new RuntimeException(e);
@@ -169,10 +220,28 @@ public class UI {
     }
 
     /**
-     * Resets the class by setting toggle to true, thereby allowing run() to run.
+     * Resets the class by setting isRunning to true, thereby allowing run() to run.
      */
     public void reset() {
-        toggle = true;
+        isRunning = true;
+    }
+
+    /**
+     * Sets the lastResponse attribute.
+     *
+     * @param text the text to set the lastResponse to.
+     */
+    public void setLastResponse(String text){
+        lastResponse = text;
+    }
+
+    /**
+     * Returns the LastResponse attribute as a String.
+     *
+     * @return the String representation of the lastResponse.
+     */
+    public String getLastResponse() {
+        return lastResponse;
     }
 
 }

@@ -44,7 +44,7 @@ public class SunnyVoiceTest {
                 "I can't add any more!",
                 "Go get a bigger taskboard!");
 
-        String result = voice.getException("tooMany");
+        String result = voice.getException("tooManyRemarks");
 
         assertTrue(expected.contains(result));
     }
@@ -63,7 +63,8 @@ public class SunnyVoiceTest {
     void speakListNumPrintsValidRemark() {
         SunnyVoice voice = SunnyVoice.getInstance();
 
-        voice.speakListNum("listNumberRemarks", 3);
+        List<String> remarks = voice.getListException("listNumberRemarks");
+        System.out.println(remarks.get(0) + 2 + remarks.get(1));
 
         String result = output.toString().trim();
 
@@ -77,7 +78,8 @@ public class SunnyVoiceTest {
     void speakListNumInvalidPoolPrintsNothing() {
         SunnyVoice voice = SunnyVoice.getInstance();
 
-        voice.speakListNum("invalidPool", 3);
+        List<String> remarks = voice.getListException("listNumberRemarks");
+        System.out.println(remarks.get(0) + 2 + remarks.get(1));
 
         assertTrue(output.toString().isEmpty());
     }

@@ -14,15 +14,15 @@ public class dateParserTest {
 
     @Test
     public void getInstanceReturnsSameInstance() {
-        dateParser first = dateParser.getInstance();
-        dateParser second = dateParser.getInstance();
+        DateParser first = DateParser.getInstance();
+        DateParser second = DateParser.getInstance();
 
         assertSame(first, second);
     }
 
     @Test
     public void parseValidDate() {
-        dateParser parser = dateParser.getInstance();
+        DateParser parser = DateParser.getInstance();
 
         Optional<LocalDateTime> result = parser.parse("24/08/2026");
 
@@ -35,7 +35,7 @@ public class dateParserTest {
 
     @Test
     public void parseNullThrowsCorrectException() {
-        dateParser parser = dateParser.getInstance();
+        DateParser parser = DateParser.getInstance();
 
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
@@ -47,7 +47,7 @@ public class dateParserTest {
 
     @Test
     public void parseSlashDate() {
-        dateParser parser = dateParser.getInstance();
+        DateParser parser = DateParser.getInstance();
 
         Optional<LocalDateTime> result = parser.parse("24/08/2026");
 
@@ -60,7 +60,7 @@ public class dateParserTest {
 
     @Test
     public void parseDashDate() {
-        dateParser parser = dateParser.getInstance();
+        DateParser parser = DateParser.getInstance();
 
         Optional<LocalDateTime> result = parser.parse("24-08-2026");
 
@@ -73,7 +73,7 @@ public class dateParserTest {
 
     @Test
     public void parseDateWithTime() {
-        dateParser parser = dateParser.getInstance();
+        DateParser parser = DateParser.getInstance();
 
         Optional<LocalDateTime> result = parser.parse("24/08/2026 1430");
 
@@ -86,7 +86,7 @@ public class dateParserTest {
 
     @Test
     public void parseTrimsWhitespace() {
-        dateParser parser = dateParser.getInstance();
+        DateParser parser = DateParser.getInstance();
 
         Optional<LocalDateTime> result =
                 parser.parse("   24/08/2026   ");
@@ -100,7 +100,7 @@ public class dateParserTest {
 
     @Test
     public void parseInvalidCalendarDateReturnsEmpty() {
-        dateParser parser = dateParser.getInstance();
+        DateParser parser = DateParser.getInstance();
 
         Optional<LocalDateTime> result =
                 parser.parse("29/02/2026");

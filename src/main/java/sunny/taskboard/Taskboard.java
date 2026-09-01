@@ -11,8 +11,8 @@ import task.Task;
  * through {@link #getInstance()}.</p>
  */
 public class Taskboard {
-    private Taskboard(){}
-    private static class holder{
+    private Taskboard() {}
+    private static class Holder {
         private static final Taskboard INSTANCE = new Taskboard();
     }
     /**
@@ -21,7 +21,7 @@ public class Taskboard {
      * @return the Taskboard singleton instance
      */
     public static Taskboard getInstance(){
-        return Taskboard.holder.INSTANCE;
+        return Holder.INSTANCE;
     }
 
     Storage storer = Storage.getInstance();
@@ -32,7 +32,7 @@ public class Taskboard {
      * Creates the taskboard directory, loads any pre-existing tasks from storage and sets
      * taskCount to the current taskboard size.
      */
-    public void load(){
+    public void load() {
         storer.createDataDirectory();
         storer.loadTasks(tasks);
         taskCount = tasks.size();
@@ -52,9 +52,9 @@ public class Taskboard {
      *
      * @param value the value to add to taskCount.
      */
-    public void setTaskCount(int value) {
+    public void updateTaskCount(int value) {
         taskCount += value;
-    }//change to update
+    }
 
     /**
      * Returns the task at the specified index.

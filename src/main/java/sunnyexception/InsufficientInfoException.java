@@ -1,16 +1,16 @@
 package sunnyexception;
 
 /**
- * Indicates that the user attempted adding more tasks than the taskboard allows.
+ * Indicates that the user provided insufficient info for a task.
  * This class extends {@link SunnyException}.
  */
-public class tooManyTasksException extends SunnyException{
+public class InsufficientInfoException extends SunnyException{
     /**
      * Constructs the exception with the specified message.
      *
      * @param message the message describing the exception.
      */
-    public tooManyTasksException (String message){
+    public InsufficientInfoException(String message){
         super(message);
     }
 }
