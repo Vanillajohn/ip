@@ -30,7 +30,7 @@ public class UserParser {
      *
      * @return the UserParser singleton instance
      */
-    public static UserParser getInstance(){
+    public static UserParser getInstance() {
         return Holder.INSTANCE;
     }
 
@@ -48,7 +48,7 @@ public class UserParser {
      * @param ui the UI object some data is sent to.
      * @throws SunnyException indicates something wrong with the user's input.
      */
-    public void parseUserInput(String input, UI ui) throws SunnyException{
+    public void parseUserInput(String input, UI ui) throws SunnyException {
         if (input.trim().isEmpty()) {
             ui.setLastResponse(sunnyVoice.getException("unrecognised"));
             throw new UnrecognisedTaskException(sunnyVoice.getException("unrecognised"));
@@ -202,8 +202,9 @@ public class UserParser {
             commandType = "error";
             throw new UnrecognisedTaskException(sunnyVoice.getException("unrecognised"));
         }
+
+        assert temp != null : "Task must exist before adding it to taskboard";
         taskboard.addTask(temp);
-        taskboard.updateTaskCount(1);
         storer.saveTasks(taskboard.getTasks());
 
         ui.replyTask(temp);

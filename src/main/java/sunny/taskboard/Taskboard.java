@@ -26,7 +26,6 @@ public class Taskboard {
 
     Storage storer = Storage.getInstance();
     ArrayList<Task> tasks = new ArrayList<>(101);
-    int taskCount;
 
     /**
      * Creates the taskboard directory, loads any pre-existing tasks from storage and sets
@@ -35,7 +34,6 @@ public class Taskboard {
     public void load() {
         storer.createDataDirectory();
         storer.loadTasks(tasks);
-        taskCount = tasks.size();
     }
 
     /**
@@ -44,16 +42,7 @@ public class Taskboard {
      * @return taskCount, the number of tasks in the taskboard.
      */
     public int getTaskCount() {
-        return taskCount;
-    }
-
-    /**
-     * Increases or decreases taskCount based on the specified value.
-     *
-     * @param value the value to add to taskCount.
-     */
-    public void updateTaskCount(int value) {
-        taskCount += value;
+        return tasks.size();
     }
 
     /**
@@ -62,7 +51,7 @@ public class Taskboard {
      * @param index the index of the task to be retrieved.
      * @return the task at index.
      */
-    public Task getTask(int index){
+    public Task getTask(int index) {
         return tasks.get(index);
     }
 
@@ -71,7 +60,7 @@ public class Taskboard {
      *
      * @param index the index of the task to be removed.
      */
-    public void removeTask(int index){
+    public void removeTask(int index) {
         tasks.remove(index);
     }
 
@@ -80,8 +69,12 @@ public class Taskboard {
      *
      * @param task the task to be appended.
      */
-    public void addTask(Task task){
-        tasks.add(task);
+    public void addTask(Task task) {
+        if (task == null){
+            throw new IllegalArgumentException("Why is a null task being added");
+        } else {
+            tasks.add(task);
+        }
     }
 
     /**
@@ -89,7 +82,7 @@ public class Taskboard {
      *
      * @return the taskboard.
      */
-    public ArrayList<Task> getTasks(){
+    public ArrayList<Task> getTasks() {
         return tasks;
     }
 
@@ -99,6 +92,5 @@ public class Taskboard {
      */
     public void clearTasks() {
         tasks.clear();
-        taskCount = 0;
     }
 }

@@ -23,7 +23,7 @@ import task.Task;
  * through {@link #getInstance()}.</p>
  */
 public class UI {
-    private UI(){}
+    private UI() {}
     private static class Holder {
         private static final UI INSTANCE = new UI();
     }
@@ -32,7 +32,7 @@ public class UI {
      *
      * @return the UI singleton instance
      */
-    public static UI getInstance(){
+    public static UI getInstance() {
         return Holder.INSTANCE;
     }
 
@@ -106,11 +106,16 @@ public class UI {
         System.out.println("____________________________________________________________");
     }
 
+    /**
+     * Prints an alreadyDone remark and the task selected by the index.
+     *
+     * @param index the index that selects the task.
+     */
     public void replyAlreadyDone(String task, int index) {
         List<String> remarks = sunnyVoice.getAlreadyDoneRemarks();
         lastResponse = remarks.get(0) + task + remarks.get(1) + "\n" + (index + 1) + "." + taskboard.getTask(index);
         System.out.println("____________________________________________________________");
-        sunnyVoice.speak("alreadyDone");
+        sunnyVoice.speak(remarks.get(0) + task + remarks.get(1));
         System.out.println(index + "." + taskboard.getTask(index));
         System.out.println("____________________________________________________________");
     }
@@ -130,7 +135,7 @@ public class UI {
             sunnyVoice.speak("noTasksLeft");
             System.out.println("____________________________________________________________");
         } else {
-            List<String> remarks = sunnyVoice.getlistNumberRemarks();
+            List<String> remarks = sunnyVoice.getListNumberRemarks();
             lastResponse = sunnyVoice.getText("deleting") + "\n" + "    " + temp + "\n" + remarks.get(0) + taskboard.getTaskCount() + remarks.get(1);
             System.out.println("____________________________________________________________");
             sunnyVoice.speak("deleting");
@@ -147,7 +152,7 @@ public class UI {
      * @param temp the task to be added to the taskboard.
      */
     public void replyTask(Task temp) {
-        List<String> remarks = sunnyVoice.getlistNumberRemarks();
+        List<String> remarks = sunnyVoice.getListNumberRemarks();
         lastResponse = sunnyVoice.getText("taskAddRemarks") + "\n" + "    " + temp + "\n" + remarks.get(0) + taskboard.getTaskCount() + remarks.get(1);
         System.out.println("____________________________________________________________");
         sunnyVoice.speak("taskAddRemarks");
@@ -231,7 +236,7 @@ public class UI {
      *
      * @param text the text to set the lastResponse to.
      */
-    public void setLastResponse(String text){
+    public void setLastResponse(String text) {
         lastResponse = text;
     }
 
