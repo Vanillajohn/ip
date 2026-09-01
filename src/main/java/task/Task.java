@@ -6,7 +6,7 @@ package task;
  */
 public class Task {
     protected String desc;
-    protected boolean marked;
+    protected boolean marked = false;
 
     /**
      * Constructs the task with the specific description.

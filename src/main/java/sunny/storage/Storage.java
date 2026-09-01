@@ -25,7 +25,7 @@ import task.ToDo;
  * through {@link #getInstance()}.</p>
  */
 public class Storage {
-    private Storage(){}
+    private Storage() {}
     private static class Holder {
         private static final Storage INSTANCE = new Storage();
     }
@@ -34,7 +34,7 @@ public class Storage {
      *
      * @return the Storage singleton instance
      */
-    public static Storage getInstance(){
+    public static Storage getInstance() {
         return Holder.INSTANCE;
     }
 
@@ -76,7 +76,7 @@ public class Storage {
         if (task instanceof Event event) {
             return "E | " + event.getDesc() + event.getFileFormat();
         }
-
+        assert false : "Tasks must be ToDo, Deadline or Event";
         return "";
     }
 
@@ -127,7 +127,6 @@ public class Storage {
 
         String type = parts[0];
         switch (type) {
-
             case "T":
                 if (parts.length != 3) {
                     throw new IllegalArgumentException("Invalid ToDo format");
@@ -232,6 +231,7 @@ public class Storage {
      * @param filePath the path that a file will be created for storing task objects.
      */
     public void setFilePath(String filePath) {
+        assert filePath != null : "filePath cannot be null";
         Storage.filePath = filePath;
     }
 }
