@@ -1,16 +1,16 @@
 package sunnyexception;
 
 /**
- * Indicates that the user requested a task at an index of the taskboard that doesn't yet exist.
+ * Indicates that the user attempted adding more tasks than the taskboard allows.
  * This class extends {@link SunnyException}.
  */
-public class taskOutOfBoundsException extends SunnyException{
+public class TooManyTasksException extends SunnyException{
     /**
      * Constructs the exception with the specified message.
      *
      * @param message the message describing the exception.
      */
-    public taskOutOfBoundsException(String message){
+    public TooManyTasksException(String message){
         super(message);
     }
 }

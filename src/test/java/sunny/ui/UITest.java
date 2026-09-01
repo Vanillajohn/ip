@@ -50,9 +50,9 @@ public class UITest {
 
         taskboard.addTask(first);
         taskboard.addTask(second);
-        taskboard.setTaskCount(2);
+        taskboard.updateTaskCount(2);
 
-        ui.list();
+        ui.replyList();
 
         String result = output.toString();
 
@@ -66,7 +66,7 @@ public class UITest {
     public void taskDisplaysTaskDescription() {
         Task task = new ToDo("buy milk");
 
-        ui.task(task);
+        ui.replyTask(task);
 
         String result = output.toString();
 
@@ -83,7 +83,7 @@ public class UITest {
 
         task.mark();
 
-        ui.mark(0);
+        ui.replyMark(0);
 
         String result = output.toString();
 
@@ -102,7 +102,7 @@ public class UITest {
 
         task.unmark();
 
-        ui.unmark(0);
+        ui.replyUnmark(0);
 
         String result = output.toString();
 
@@ -111,12 +111,12 @@ public class UITest {
     }
 
     @Test
-    public void goodbyeTurnsOffUI() {
-        ui.toggle = true;
+    public void replyGoodbyeTurnsOffUI() {
+        ui.isRunning = true;
 
-        ui.goodbye();
+        ui.replyGoodbye();
 
-        assertFalse(ui.toggle);
+        assertFalse(ui.isRunning);
     }
 
     @Test
@@ -178,7 +178,7 @@ public class UITest {
 
         System.setOut(new PrintStream(output));
 
-        ui.find(foundTasks);
+        ui.replyFind(foundTasks);
 
         String printedOutput = output.toString();
 

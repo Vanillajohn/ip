@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Optional;
 
-import sunny.utility.dateParser;
+import sunny.utility.DateParser;
 import task.Deadline;
 import task.Event;
 import task.Task;
@@ -26,7 +26,7 @@ import task.ToDo;
  */
 public class Storage {
     private Storage(){}
-    private static class holder{
+    private static class Holder {
         private static final Storage INSTANCE = new Storage();
     }
     /**
@@ -35,24 +35,24 @@ public class Storage {
      * @return the Storage singleton instance
      */
     public static Storage getInstance(){
-        return holder.INSTANCE;
+        return Holder.INSTANCE;
     }
 
-    private static String FILE_PATH = "./data/Sunny'sAmazingTaskboard(ForHerBothersomeUser).txt";
-    static dateParser parser = dateParser.getInstance();
+    private static String filePath = "./data/Sunny'sAmazingTaskboard(ForHerBothersomeUser).txt";
+    static DateParser dateParser = DateParser.getInstance();
 
     /**
      * Writes each task in the taskboard to the designated filepath based on the
-     * format specified in taskToFileFormat.
+     * format specified in convertTaskToFileFormat.
      * If an IOException occurs when writing, a message will be printed.
      *
      * @param tasks the taskboard as an ArrayList<Task> to write into a file.
      */
     public void saveTasks(ArrayList<Task> tasks) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
 
             for (Task task : tasks) {
-                writer.write(taskToFileFormat(task));
+                writer.write(convertTaskToFileFormat(task));
                 writer.newLine();
             }
         } catch (IOException e) {
@@ -66,7 +66,7 @@ public class Storage {
      * @param task the task object to be formatted.
      * @return a String that is the formatted task object.
      */
-    private static String taskToFileFormat(Task task) {
+    private static String convertTaskToFileFormat(Task task) {
         if (task instanceof ToDo) {
             return "T | " + task.getDesc() + " | " + (task.isDone() ? "1" : "0");
         }
@@ -82,7 +82,7 @@ public class Storage {
 
     /**
      * Loads pre-existing tasks from the data file into the given task list.
-     * It creates and appends task objects based on taskFromFileFormat.
+     * It creates and appends task objects based on convertTaskFromFileFormat.
      * If the data file is corrupted, it is deleted using deleteDateFile() and an empty task list is used.
      * If an IOException occurs while reading the file, an error message is printed.
      *
@@ -91,11 +91,11 @@ public class Storage {
     public void loadTasks(ArrayList<Task> tasks) {
         ArrayList<Task> loadedTasks = new ArrayList<>();
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
 
             while ((line = reader.readLine()) != null) {
-                Task task = taskFromFileFormat(line);
+                Task task = convertTaskFromFileFormat(line);
                 loadedTasks.add(task);
             }
             tasks.addAll(loadedTasks);// Only modify the real task list if the ENTIRE file was valid
@@ -119,7 +119,7 @@ public class Storage {
      * @return the task the String is formatted into.
      * @throws IllegalArgumentException if the line has an invalid or unknown task format.
      */
-    private static Task taskFromFileFormat(String line) {
+    private static Task convertTaskFromFileFormat(String line) {
         String[] parts = line.split(" \\| ", -1);
         if (parts.length == 0) {
             throw new IllegalArgumentException("Empty task line");
@@ -151,7 +151,7 @@ public class Storage {
                 }
                 Deadline deadline = null;
 
-                Optional<LocalDateTime> dateOpt = parser.parse(parts[2]);
+                Optional<LocalDateTime> dateOpt = dateParser.parse(parts[2]);
 
                 if (dateOpt.isPresent()) {
                     LocalDateTime actualDate = dateOpt.get();
@@ -174,8 +174,8 @@ public class Storage {
                 }
                 Event event = null;
 
-                Optional<LocalDateTime> startOpt = parser.parse(parts[2]);
-                Optional<LocalDateTime> endOpt = parser.parse(parts[3]);
+                Optional<LocalDateTime> startOpt = dateParser.parse(parts[2]);
+                Optional<LocalDateTime> endOpt = dateParser.parse(parts[3]);
 
                 if (startOpt.isPresent() && endOpt.isPresent()) {
                     LocalDateTime startActual = startOpt.get();
@@ -220,7 +220,7 @@ public class Storage {
      */
     private static void deleteDataFile() {
         try {
-            Files.deleteIfExists(Paths.get(FILE_PATH));
+            Files.deleteIfExists(Paths.get(filePath));
         } catch (IOException e) {
             System.out.println("Could not delete corrupted data file: " + e);
         }
@@ -232,6 +232,6 @@ public class Storage {
      * @param filePath the path that a file will be created for storing task objects.
      */
     public void setFilePath(String filePath) {
-        FILE_PATH = filePath;
+        Storage.filePath = filePath;
     }
 }
