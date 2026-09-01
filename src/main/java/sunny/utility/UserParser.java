@@ -172,7 +172,6 @@ public class UserParser {
                 }
                 temp = taskboard.getTask(index);
                 taskboard.removeTask(index);
-                taskboard.updateTaskCount(-1);
                 storer.saveTasks(taskboard.getTasks());
 
                 ui.replyDelete(temp);
