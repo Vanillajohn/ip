@@ -124,6 +124,7 @@ public class SunnyVoice {
                 index = this.rand.nextInt(listNumberRemarks.size());
                 return listNumberRemarks.get(index);
         }
+        assert false : "pool should trigger a case";
         return null;
     }
 
@@ -148,7 +149,7 @@ public class SunnyVoice {
             case "tooManyKeywords":
                 return getExceptionHelper(tooManyKeywordsRemarks);
         }
-        return null;
+        return "The input text is wrong, you dumb developer!";
     }
 
     private String getExceptionHelper(List<String> text) {
@@ -249,7 +250,7 @@ public class SunnyVoice {
      *
      * @return the components of the remark as a List<String>.
      */
-    public List<String> getlistNumberRemarks() {
+    public List<String> getListNumberRemarks() {
         int index = this.rand.nextInt(listNumberRemarks.size());
         return listNumberRemarks.get(index);
     }
@@ -275,11 +276,13 @@ public class SunnyVoice {
     }
 
     private String getTextHelper(List<String> text) {
+        assert !text.isEmpty() : "text should be non-empty";
         int index = this.rand.nextInt(text.size());
         return text.get(index);
     }
 
     private void speakHelper(List<String> text) {
+        assert !text.isEmpty() : "text should be non-empty";
         int index = this.rand.nextInt(text.size());
         System.out.println(text.get(index));
     }

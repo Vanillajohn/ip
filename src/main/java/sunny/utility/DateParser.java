@@ -8,16 +8,17 @@ import java.time.temporal.ChronoField;
 import java.util.Optional;
 
 public class DateParser {
-    private DateParser(){}
+    private DateParser() {}
     private static class Holder {
         private static final DateParser INSTANCE = new DateParser();
     }
     /**
+     *
      * Returns the singleton instance of DateParser.
      *
      * @return the DateParser singleton instance
      */
-    public static DateParser getInstance(){
+    public static DateParser getInstance() {
         return Holder.INSTANCE;
     }
 
@@ -43,7 +44,7 @@ public class DateParser {
      */
     public Optional<LocalDateTime> parse(String inputDate){//dd/mm/yyyy, dd-mm-yyyy, either two with time
         if (inputDate == null) {
-            throw new IllegalArgumentException("Input string cannot be null");
+            throw new IllegalArgumentException("Input string for DateParser.parse cannot be null");
         }
         try {
             return Optional.of(LocalDateTime.parse(inputDate.trim(), FLEXIBLE_FORMATTER));

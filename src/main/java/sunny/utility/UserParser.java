@@ -30,7 +30,7 @@ public class UserParser {
      *
      * @return the UserParser singleton instance
      */
-    public static UserParser getInstance(){
+    public static UserParser getInstance() {
         return Holder.INSTANCE;
     }
 
@@ -48,7 +48,7 @@ public class UserParser {
      * @param ui the UI object some data is sent to.
      * @throws SunnyException indicates something wrong with the user's input.
      */
-    public void parseUserInput(String input, UI ui) throws SunnyException{
+    public void parseUserInput(String input, UI ui) throws SunnyException {
         if (input.trim().isEmpty()) {
             ui.setLastResponse(sunnyVoice.getException("unrecognised"));
             throw new UnrecognisedTaskException(sunnyVoice.getException("unrecognised"));
@@ -66,14 +66,14 @@ public class UserParser {
                 commandType = "list";
                 return;
             case "mark":
-                if (parts.length == 1){
+                if (parts.length == 1) {
                     ui.setLastResponse(sunnyVoice.getException("insufficient"));
                     commandType = "error";
                     throw new InsufficientInfoException(sunnyVoice.getException("insufficient"));
                 }
 
                 int index1;
-                try{
+                try {
                     index1 = Integer.parseInt(parts[1]) - 1;
                 } catch (NumberFormatException e) {
                     ui.setLastResponse(sunnyVoice.getException("notInteger"));
@@ -90,7 +90,7 @@ public class UserParser {
                     } else {
                         relavantTask.mark();
                         storer.saveTasks(taskboard.getTasks());
-                        ui.replyMark(index1 + 1);
+                        ui.replyMark(index1);
                         commandType = "mark";
                         return;
                     }
@@ -100,13 +100,13 @@ public class UserParser {
                     throw new TaskOutOfBoundsException(sunnyVoice.getException("missingTask"));
                 }
             case "unmark":
-                if (parts.length == 1){
+                if (parts.length == 1) {
                     ui.setLastResponse(sunnyVoice.getException("insufficient"));
                     commandType = "error";
                     throw new InsufficientInfoException(sunnyVoice.getException("insufficient"));
                 }
                 int index2;
-                try{
+                try {
                     index2 = Integer.parseInt(parts[1]) - 1;
                 } catch (NumberFormatException e) {
                     ui.setLastResponse(sunnyVoice.getException("notInteger"));
@@ -123,7 +123,7 @@ public class UserParser {
                     } else {
                         relavantTask.unmark();
                         storer.saveTasks(taskboard.getTasks());
-                        ui.replyUnmark(index2 + 1);
+                        ui.replyUnmark(index2);
                         commandType = "unmark";
                         return;
                     }
@@ -133,7 +133,7 @@ public class UserParser {
                     throw new TaskOutOfBoundsException(sunnyVoice.getException("missingTask"));
                 }
             case "todo":
-                if (parts.length == 1){
+                if (parts.length == 1) {
                     List<String> remarks = sunnyVoice.getDescEmptyRemarks();
                     ui.setLastResponse(remarks.get(0) +  "todo" + remarks.get(1));
                     commandType = "error";
@@ -143,14 +143,14 @@ public class UserParser {
                 commandType = "task";
                 break;
             case "deadline":
-                if (parts.length == 1){
+                if (parts.length == 1) {
                     List<String> remarks = sunnyVoice.getDescEmptyRemarks();
                     ui.setLastResponse(remarks.get(0) +  "deadline" + remarks.get(1));
                     commandType = "error";
                     throw new TaskEmptyDescException(sunnyVoice.getListException("descEmpty"), "deadline");
                 }
                 int slashIndex = input.indexOf("/by");
-                if (slashIndex == -1){
+                if (slashIndex == -1) {
                     ui.setLastResponse(sunnyVoice.getException("insufficient"));
                     commandType = "error";
                     throw new InsufficientInfoException(sunnyVoice.getException("insufficient"));
@@ -170,7 +170,7 @@ public class UserParser {
                 }
 
             case "event":
-                if (parts.length == 1){
+                if (parts.length == 1) {
                     List<String> remarks = sunnyVoice.getDescEmptyRemarks();
                     ui.setLastResponse(remarks.get(0) +  "event" + remarks.get(1));
                     commandType = "error";
@@ -208,13 +208,13 @@ public class UserParser {
                     break;
                 }
             case "delete":
-                if (parts.length == 1){
+                if (parts.length == 1) {
                     ui.setLastResponse(sunnyVoice.getException("insufficient"));
                     commandType = "error";
                     throw new InsufficientInfoException(sunnyVoice.getException("insufficient"));
                 }
                 int index3;
-                try{
+                try {
                     index3 = Integer.parseInt(parts[1]) - 1;
                 } catch (NumberFormatException e) {
                     ui.setLastResponse(sunnyVoice.getException("notInteger"));
@@ -225,7 +225,6 @@ public class UserParser {
                 if (index3 >= 0 && index3 < taskboard.getTaskCount() && taskboard.getTask(index3) != null) {//if tasks at index has something
                     temp = taskboard.getTask(index3);
                     taskboard.removeTask(index3);
-                    taskboard.updateTaskCount(-1);
                     storer.saveTasks(taskboard.getTasks());
 
                     ui.replyDelete(temp);
@@ -240,7 +239,7 @@ public class UserParser {
                 if (parts.length == 1){
                     ui.setLastResponse(sunnyVoice.getException("insufficient"));
                     commandType = "error";
-                throw new InsufficientInfoException(sunnyVoice.getException("insufficient"));
+                    throw new InsufficientInfoException(sunnyVoice.getException("insufficient"));
                 }
                 if (parts.length > 2){
                     ui.setLastResponse(sunnyVoice.getException("tooManyKeywords"));
@@ -264,8 +263,9 @@ public class UserParser {
             commandType = "error";
             throw new UnrecognisedTaskException(sunnyVoice.getException("unrecognised"));
         }
+
+        assert temp != null : "Task must exist before adding it to taskboard";
         taskboard.addTask(temp);
-        taskboard.updateTaskCount(1);
         storer.saveTasks(taskboard.getTasks());
 
         ui.replyTask(temp);
