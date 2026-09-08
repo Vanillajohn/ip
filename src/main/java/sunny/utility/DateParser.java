@@ -22,6 +22,8 @@ public class DateParser {
         return Holder.INSTANCE;
     }
 
+    private final DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HHmm");
+
     private static final DateTimeFormatter FLEXIBLE_FORMATTER = new DateTimeFormatterBuilder()
             // 1. Handle the date part variants
             .appendPattern("[dd/MM/uuuu][dd-MM-uuuu]")
@@ -42,7 +44,7 @@ public class DateParser {
      * @param inputDate the String to be parsed.
      * @return an Optional object containing a LocalDateTime object, or nothing.
      */
-    public Optional<LocalDateTime> parse(String inputDate){//dd/mm/yyyy, dd-mm-yyyy, either two with time
+    public Optional<LocalDateTime> parse(String inputDate) {//dd/mm/yyyy, dd-mm-yyyy, either two with time
         if (inputDate == null) {
             throw new IllegalArgumentException("Input string for DateParser.parse cannot be null");
         }

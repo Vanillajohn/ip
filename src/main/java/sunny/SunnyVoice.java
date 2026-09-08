@@ -105,6 +105,21 @@ public class SunnyVoice {
     List<String> noTasksLeft = List.of(
             "That was your last task. I can go now, right?",
             "Your list is empty now. I'm shaking with excitement.");
+    List<String> incorrectDateFormat = List.of(
+            "Aww, look who can't give a date in dd/mm/yyyy or dd-mm-yyyy format!",
+            "The only date I'm interested in has the format dd/mm/yyyy or dd-mm-yyyy!");
+    List<String> haveEvents = List.of(
+            "Well aren't you busy with all these tasks on that day:",
+            "I'm DEFINITELY not bummed that I can't see you that day with these tasks:");
+    List<String> haveDeadlines = List.of(
+            "By the way, you still have deadlines due:",
+            "Don't forget about these deadlines, you nimrod:");
+    List<String> noEvents = List.of(
+            "Nothing's happening on that day. Sure you didn't input a task wrongly, you dummy?",
+            "Seems like you're free that day. And yes, I DON'T want to see you either!");
+    List<String> noDeadlines = List.of(
+            "Huh, no deadlines. Sure you inputted all your tasks correctly, you idiot?",
+            "A lack of deadlines is probably a lack of productivity, or a misinput!");
 
     private Random rand = new Random();
 
@@ -148,6 +163,8 @@ public class SunnyVoice {
                 return getExceptionHelper(notIntegerRemarks);
             case "tooManyKeywords":
                 return getExceptionHelper(tooManyKeywordsRemarks);
+            case "incorrectDateFormat":
+                return getExceptionHelper(incorrectDateFormat);
         }
         return "The input text is wrong, you dumb developer!";
     }
@@ -204,6 +221,18 @@ public class SunnyVoice {
             case "noTasksLeft":
                 speakHelper(noTasksLeft);
                 break;
+            case "haveEvents":
+                speakHelper(haveEvents);
+                break;
+            case "haveDeadlines":
+                speakHelper(haveDeadlines);
+                break;
+            case "noEvents":
+                speakHelper(noEvents);
+                break;
+            case "noDeadlines":
+                speakHelper(noDeadlines);
+                break;
             default:
                 System.out.println("The input text is wrong, you dumb developer!");
         }
@@ -241,6 +270,14 @@ public class SunnyVoice {
                 return getTextHelper(noListRemarks);
             case "noTasksLeft":
                 return getTextHelper(noTasksLeft);
+            case "haveEvents":
+                return getTextHelper(haveEvents);
+            case "haveDeadlines":
+                return getTextHelper(haveDeadlines);
+            case "noEvents":
+                return getTextHelper(noEvents);
+            case "noDeadlines":
+                return getTextHelper(noDeadlines);
         }
         return "The input text is wrong, you dumb developer!";
     }

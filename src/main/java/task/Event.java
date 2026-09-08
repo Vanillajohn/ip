@@ -10,7 +10,7 @@ import java.time.format.DateTimeFormatter;
 public class Event extends Task {
     protected LocalDateTime start, end;
     protected String notStart, notEnd;
-    private final DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+    private final DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HHmm");
 
     /**
      * Constructs the task with the specific description, start and end dates.
@@ -47,6 +47,24 @@ public class Event extends Task {
         } else {
             return " | " + this.notStart + " | " + this.notEnd + " | " + (this.isDone() ? "1" : "0");
         }
+    }
+
+    /**
+     * Returns the LocalDateTime start date.
+     *
+     * @return the start date as a LocalDateTime.
+     */
+    public LocalDateTime getStart() {
+        return start;
+    }
+
+    /**
+     * Returns the LocalDateTime end date.
+     *
+     * @return the end date as a LocalDateTime.
+     */
+    public LocalDateTime getEnd() {
+        return end;
     }
 
     /**
