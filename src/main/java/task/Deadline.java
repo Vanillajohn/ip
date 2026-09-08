@@ -10,7 +10,7 @@ import java.time.format.DateTimeFormatter;
 public class Deadline extends Task {
     protected LocalDateTime by;
     protected String notDate;
-    private final DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+    private final DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HHmm");
 
     /**
      * Constructs the task with the specific description and due date.
@@ -24,6 +24,15 @@ public class Deadline extends Task {
         super(description);
         this.by = by;
         this.notDate = notDate;
+    }
+
+    /**
+     * Returns the task's deadline, if present.
+     *
+     * @return the task's deadline.
+     */
+    public LocalDateTime getBy() {
+        return by;
     }
 
     /**

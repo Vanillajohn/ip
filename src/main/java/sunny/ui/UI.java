@@ -7,6 +7,7 @@ import java.util.Scanner;
 import sunny.SunnyVoice;
 import sunny.taskboard.Taskboard;
 import sunny.utility.UserParser;
+import sunnyexception.IncorrectDateFormatException;
 import sunnyexception.SunnyException;
 import sunnyexception.TaskEmptyDescException;
 import sunnyexception.UnrecognisedTaskException;
@@ -66,6 +67,8 @@ public class UI {
             System.out.println("____________________________________________________________");
             lastResponse = sunnyVoice.getText("noList");
         } else {
+            System.out.println("____________________________________________________________");
+            sunnyVoice.speak("listRemarks");
             String response = "";
             int i = 0;
             while (i < taskboard.getTaskCount()) {
@@ -73,8 +76,6 @@ public class UI {
                 response += i + 1 + "." + taskboard.getTask(i) + "\n";
                 i += 1;
             }
-            System.out.println("____________________________________________________________");
-            sunnyVoice.speak("listRemarks");
             System.out.println("____________________________________________________________");
             lastResponse = sunnyVoice.getText("listRemarks") + "\n" + response;
         }
@@ -188,6 +189,57 @@ public class UI {
         }
     }
 
+    public void replyViewSchedule(ArrayList<Task> events, ArrayList<Task> deadlines) {
+        String response = "";
+        int i = 1;
+        int j = 1;
+        if (events.isEmpty() && deadlines.isEmpty()) {
+            System.out.println("____________________________________________________________");
+            sunnyVoice.speak("noEvents");
+            sunnyVoice.speak("noDeadlines");
+            System.out.println("____________________________________________________________");
+            lastResponse = sunnyVoice.getText("noEvents") + "\n" + sunnyVoice.getText("noDeadlines");
+        } else if (events.isEmpty()) {
+            System.out.println("____________________________________________________________");
+            sunnyVoice.speak("noEvents");
+            response += sunnyVoice.getText("haveDeadlines") + "\n";
+            for (Task deadline : deadlines) {
+                System.out.println(j + "." + deadline);
+                response += j + "." + deadline + "\n";
+                j += 1;
+            }
+            System.out.println("____________________________________________________________");
+            lastResponse = sunnyVoice.getText("noEvents") + "\n" + response;
+        } else if (deadlines.isEmpty()) {
+            System.out.println("____________________________________________________________");
+            response += sunnyVoice.getText("haveEvents") + "\n";
+            for (Task event : events) {
+                System.out.println(i + "." + event);
+                response += i + "." + event + "\n";
+                i += 1;
+            }
+            sunnyVoice.speak("noDeadlines");
+            System.out.println("____________________________________________________________");
+            lastResponse = response + "\n" + sunnyVoice.getText("noDeadlines");
+        } else {
+            System.out.println("____________________________________________________________");
+            response += sunnyVoice.getText("haveEvents") + "\n";
+            for (Task event : events) {
+                System.out.println(i + "." + event);
+                response += i + "." + event + "\n";
+                i += 1;
+            }
+            response += sunnyVoice.getText("haveDeadlines") + "\n";
+            for (Task deadline : deadlines) {
+                System.out.println(j + "." + deadline);
+                response += j + "." + deadline + "\n";
+                j += 1;
+            }
+            System.out.println("____________________________________________________________");
+            lastResponse = response;
+        }
+    }
+
     /**
      * Continuously reads user input and sends it to UserParser for processing until the UI is stopped.
      * Handles exceptions resulting from invalid input.
@@ -205,8 +257,8 @@ public class UI {
                 userParser.parseUserInput(input, this);
             }
             catch (UnrecognisedTaskException | TaskEmptyDescException | InsufficientInfoException |
-                   TooManyTasksException |
-                   TaskOutOfBoundsException | TooManyKeywordsException e) {
+                   TooManyTasksException | TaskOutOfBoundsException | TooManyKeywordsException |
+                   IncorrectDateFormatException e) {
                 System.out.println("____________________________________________________________");
                 System.out.println(e.getMessage());
                 System.out.println("____________________________________________________________");

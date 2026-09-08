@@ -5,6 +5,7 @@ import java.util.Scanner;
 import sunny.taskboard.Taskboard;
 import sunny.ui.UI;
 import sunny.utility.UserParser;
+import sunnyexception.IncorrectDateFormatException;
 import sunnyexception.SunnyException;
 import sunnyexception.TaskEmptyDescException;
 import sunnyexception.UnrecognisedTaskException;
@@ -45,7 +46,8 @@ public class Sunny {
                         parser.parseUserInput(input, ui);
                         return ui.getLastResponse();
                 } catch (UnrecognisedTaskException | TaskEmptyDescException | InsufficientInfoException |
-                         TooManyTasksException | TaskOutOfBoundsException | TooManyKeywordsException e) {
+                         TooManyTasksException | TaskOutOfBoundsException | TooManyKeywordsException |
+                         IncorrectDateFormatException e) {
                         ui.setLastResponse(e.getMessage());
                         return ui.getLastResponse();
                 }

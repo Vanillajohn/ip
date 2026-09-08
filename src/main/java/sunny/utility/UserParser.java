@@ -9,6 +9,7 @@ import sunny.SunnyVoice;
 import sunny.storage.Storage;
 import sunny.taskboard.Taskboard;
 import sunny.ui.UI;
+import sunnyexception.IncorrectDateFormatException;
 import sunnyexception.SunnyException;
 import sunnyexception.TaskEmptyDescException;
 import sunnyexception.UnrecognisedTaskException;
@@ -114,7 +115,7 @@ public class UserParser {
             case "deadline":
                 checkIfDescEmpty(parts, ui, "deadline");
                 int slashIndex = input.indexOf("/by");
-                if (slashIndex == -1){
+                if (slashIndex == -1) {
                     throwInsufficient(ui);
                 }
                 String description = String.join(" ", input.substring(9, slashIndex)).trim();
@@ -136,7 +137,7 @@ public class UserParser {
                 checkIfDescEmpty(parts, ui, "event");
                 int firstSlash = input.indexOf("/from");
                 int secondSlash = input.indexOf("/to");
-                if (firstSlash == -1 || secondSlash == -1 || firstSlash > secondSlash){
+                if (firstSlash == -1 || secondSlash == -1 || firstSlash > secondSlash) {
                     throwInsufficient(ui);
                 }
                 String desc = input.substring(6, firstSlash);
@@ -179,20 +180,53 @@ public class UserParser {
                 return;
             case "find":
                 checkIfInsufficient(parts, ui);
-                if (parts.length > 2){
+                if (parts.length > 2) {
                     ui.setLastResponse(sunnyVoice.getException("tooManyKeywords"));
                     commandType = "error";
                     throw new TooManyKeywordsException(sunnyVoice.getException("tooManyKeywords"));
                 }
                 String keyword = parts[1];
                 ArrayList<Task> foundTasks = new ArrayList<>();
-                for (Task task : taskboard.getTasks()){
-                    if (task.getDesc().contains(keyword)){
+                for (Task task : taskboard.getTasks()) {
+                    if (task.getDesc().contains(keyword)) {
                         foundTasks.add(task);
                     }
                 }
 
                 ui.replyFind(foundTasks);
+                commandType = "find";
+                return;
+            case "viewschedule":
+                checkIfInsufficient(parts, ui);
+                if (parts.length > 2) {
+                    ui.setLastResponse(sunnyVoice.getException("tooManyKeywords"));
+                    commandType = "error";
+                    throw new TooManyKeywordsException(sunnyVoice.getException("tooManyKeywords"));
+                }
+                Optional<LocalDateTime> keyDate = parser.parse(parts[1]);
+                if (keyDate.isEmpty()) {
+                    ui.setLastResponse(sunnyVoice.getException("incorrectDateFormat"));
+                    commandType = "error";
+                    throw new IncorrectDateFormatException(sunnyVoice.getException("incorrectDateFormat"));
+                }
+                ArrayList<Task> eventsInKeyDate = new ArrayList<>();
+                ArrayList<Task> deadlinesInKeyDate = new ArrayList<>();
+                for (Task task : taskboard.getTasks()) {
+                    if (task instanceof Deadline && ((Deadline) task).getBy() != null) {
+                        boolean isKeyDateBeforeDeadline = !keyDate.get().isAfter(((Deadline) task).getBy());
+                        if (isKeyDateBeforeDeadline) {
+                            deadlinesInKeyDate.add(task);
+                        }
+                    }
+                    else if (task instanceof Event && (((Event) task).getStart() != null && ((Event) task).getEnd() != null)) {
+                        boolean isKeyDateAfterStart = !keyDate.get().isBefore(((Event) task).getStart());
+                        boolean isKeyDateBeforeEnd = !keyDate.get().isAfter(((Event) task).getEnd());
+                        if (isKeyDateBeforeEnd && isKeyDateAfterStart) {
+                            eventsInKeyDate.add(task);
+                        }
+                    }
+                }
+                ui.replyViewSchedule(eventsInKeyDate, deadlinesInKeyDate);
                 commandType = "find";
                 return;
         }
