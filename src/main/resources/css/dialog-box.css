@@ -27,8 +27,8 @@
     -fx-background-color: lightpink;
 }
 
-.enter/exit-label {
-    -fx-background-color: yellow;
+.enter-exit-label {
+    -fx-background-color: #ffe600;
 }
 
 #displayPicture {

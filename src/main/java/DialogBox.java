@@ -76,10 +76,10 @@ public class DialogBox extends HBox {
                 dialog.getStyleClass().add("marked-label");
                 break;
             case "greeting":
-                dialog.getStyleClass().add("enter/exit-label");
+                dialog.getStyleClass().add("enter-exit-label");
                 break;
             case "goodbye":
-                dialog.getStyleClass().add("enter/exit-label");
+                dialog.getStyleClass().add("enter-exit-label");
                 break;
             case "error":
                 dialog.getStyleClass().add("error-label");

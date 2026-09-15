@@ -41,7 +41,7 @@ public class UserParser {
     private DateParser parser = DateParser.getInstance();
     private Taskboard taskboard = Taskboard.getInstance();
     private SunnyVoice sunnyVoice = SunnyVoice.getInstance();
-    private String commandType;
+    private String commandType = "greeting";
 
     /**
      * Parses the user's input and prints to the CLI the chatbot's response while
