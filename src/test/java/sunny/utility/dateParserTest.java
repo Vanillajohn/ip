@@ -10,7 +10,7 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
-public class dateParserTest {
+public class DateParserTest {
 
     @Test
     public void getInstanceReturnsSameInstance() {

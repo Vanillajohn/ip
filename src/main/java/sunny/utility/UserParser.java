@@ -1,5 +1,7 @@
 package sunny.utility;
 
+import java.io.IOException;
+import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,196 +53,262 @@ public class UserParser {
      */
     public void parseUserInput(String input, UI ui) throws SunnyException {
         if (input.trim().isEmpty()) {
-            ui.setLastResponse(sunnyVoice.getException("unrecognised"));
-            throw new UnrecognisedTaskException(sunnyVoice.getException("unrecognised"));
+            throwUnrecognised(ui);
         }
-        String[] parts = input.split(" ");
+        String[] parts = input.trim().split("\\s+");
         String command = parts[0].toLowerCase();
         Task temp = null;
-        int index;
         switch (command) {
             case "bye":
-                ui.replyGoodbye();
-                commandType = "goodbye";
+                executeBye(ui);
                 return;
             case "list":
-                ui.replyList();
-                commandType = "list";
+                executeList(ui);
                 return;
             case "mark":
-                checkIfInsufficient(parts, ui);
-
-                index = getInputFromParts(parts, ui);
-
-                if (!validateIndex(index)) { //if tasks at index has something
-                    throwMissingTask(ui);
-                }
-                temp = taskboard.getTask(index);
-                if (temp.isDone()) {
-                    ui.replyAlreadyDone("marked", index);
-                    commandType = "alreadyDone";
-                    return;
-                } else {
-                    temp.mark();
-                    storer.saveTasks(taskboard.getTasks());
-                    ui.replyMark(index);
-                    commandType = "mark";
-                    return;
-                }
+                executeMark(ui, parts);
+                return;
             case "unmark":
-                checkIfInsufficient(parts, ui);
-                index = getInputFromParts(parts, ui);
-
-                if (!validateIndex(index)) {//if tasks at index doesn't have something
-                    throwMissingTask(ui);
-                }
-                temp = taskboard.getTask(index);
-                if (!temp.isDone()) {
-                    ui.replyAlreadyDone("unmarked", index);
-                    commandType = "alreadyDone";
-                    return;
-                } else {
-                    temp.unmark();
-                    storer.saveTasks(taskboard.getTasks());
-                    ui.replyUnmark(index);
-                    commandType = "unmark";
-                    return;
-                }
-
+                executeUnmark(ui, parts);
+                return;
             case "todo":
-                checkIfDescEmpty(parts, ui, "todo");
-                temp = new ToDo(String.join(" ", input.substring(4)));
-                commandType = "task";
+                temp = executeTodo(input, ui, parts);
                 break;
             case "deadline":
-                checkIfDescEmpty(parts, ui, "deadline");
-                int slashIndex = input.indexOf("/by");
-                if (slashIndex == -1) {
-                    throwInsufficient(ui);
-                }
-                String description = String.join(" ", input.substring(9, slashIndex)).trim();
-
-                String dateString = input.substring(slashIndex + 3).trim();
-                Optional<LocalDateTime> dateOpt = parser.parse(dateString);
-                commandType = "task";
-
-                if (dateOpt.isPresent()) {
-                    LocalDateTime actualDate = dateOpt.get();
-                    temp = new Deadline(description, actualDate, "");
-                    break;
-                } else {
-                    temp = new Deadline(description, null, dateString);
-                    break;
-                }
-
+                temp = executeDeadline(input, ui, parts);
+                break;
             case "event":
-                checkIfDescEmpty(parts, ui, "event");
-                int firstSlash = input.indexOf("/from");
-                int secondSlash = input.indexOf("/to");
-                if (firstSlash == -1 || secondSlash == -1 || firstSlash > secondSlash) {
-                    throwInsufficient(ui);
-                }
-                String desc = input.substring(6, firstSlash);
-                String startString = input.substring(firstSlash + 5, secondSlash).trim();
-                String endString = input.substring(secondSlash + 3).trim();
-                Optional<LocalDateTime> startOpt = parser.parse(startString);
-                Optional<LocalDateTime> endOpt = parser.parse(endString);
-                commandType = "task";
-
-                if (startOpt.isPresent() && endOpt.isPresent()) {
-                    LocalDateTime startActual = startOpt.get();
-                    LocalDateTime endActual = endOpt.get();
-                    temp = new Event(desc, startActual, endActual, "", "");
-                    break;
-                } else if (startOpt.isPresent()) {
-                    LocalDateTime startActual = startOpt.get();
-                    temp = new Event(desc, startActual, null, "", endString);
-                    break;
-                } else if (endOpt.isPresent()) {
-                    LocalDateTime endActual = endOpt.get();
-                    temp = new Event(desc, null, endActual, startString, "");
-                    break;
-                } else {
-                    temp = new Event(desc, null, null, startString, endString);
-                    break;
-                }
+                temp = executeEvent(input, ui, parts);
+                break;
             case "delete":
-                checkIfInsufficient(parts, ui);
-                index = getInputFromParts(parts, ui);
-
-                if (!validateIndex(index)) {//if tasks at index has something
-                    throwMissingTask(ui);
-                }
-                temp = taskboard.getTask(index);
-                taskboard.removeTask(index);
-                storer.saveTasks(taskboard.getTasks());
-
-                ui.replyDelete(temp);
-                commandType = "delete";
+                executeDelete(ui, parts);
                 return;
             case "find":
-                checkIfInsufficient(parts, ui);
-                if (parts.length > 2) {
-                    ui.setLastResponse(sunnyVoice.getException("tooManyKeywords"));
-                    commandType = "error";
-                    throw new TooManyKeywordsException(sunnyVoice.getException("tooManyKeywords"));
-                }
-                String keyword = parts[1];
-                ArrayList<Task> foundTasks = new ArrayList<>();
-                for (Task task : taskboard.getTasks()) {
-                    if (task.getDesc().contains(keyword)) {
-                        foundTasks.add(task);
-                    }
-                }
-
-                ui.replyFind(foundTasks);
-                commandType = "find";
+                executeFind(ui, parts);
                 return;
             case "viewschedule":
-                checkIfInsufficient(parts, ui);
-                if (parts.length > 2) {
-                    ui.setLastResponse(sunnyVoice.getException("tooManyKeywords"));
-                    commandType = "error";
-                    throw new TooManyKeywordsException(sunnyVoice.getException("tooManyKeywords"));
-                }
-                Optional<LocalDateTime> keyDate = parser.parse(parts[1]);
-                if (keyDate.isEmpty()) {
-                    ui.setLastResponse(sunnyVoice.getException("incorrectDateFormat"));
-                    commandType = "error";
-                    throw new IncorrectDateFormatException(sunnyVoice.getException("incorrectDateFormat"));
-                }
-                ArrayList<Task> eventsInKeyDate = new ArrayList<>();
-                ArrayList<Task> deadlinesInKeyDate = new ArrayList<>();
-                for (Task task : taskboard.getTasks()) {
-                    if (task instanceof Deadline && ((Deadline) task).getBy() != null) {
-                        boolean isKeyDateBeforeDeadline = !keyDate.get().isAfter(((Deadline) task).getBy());
-                        if (isKeyDateBeforeDeadline) {
-                            deadlinesInKeyDate.add(task);
-                        }
-                    }
-                    else if (task instanceof Event && (((Event) task).getStart() != null && ((Event) task).getEnd() != null)) {
-                        boolean isKeyDateAfterStart = !keyDate.get().isBefore(((Event) task).getStart());
-                        boolean isKeyDateBeforeEnd = !keyDate.get().isAfter(((Event) task).getEnd());
-                        if (isKeyDateBeforeEnd && isKeyDateAfterStart) {
-                            eventsInKeyDate.add(task);
-                        }
-                    }
-                }
-                ui.replyViewSchedule(eventsInKeyDate, deadlinesInKeyDate);
-                commandType = "find";
+                executeViewschedule(ui, parts);
+                return;
+            case "help":
+                executeHelp(ui, parts);
                 return;
         }
         if (temp == null) {
-            ui.setLastResponse(sunnyVoice.getException("unrecognised"));
-            commandType = "error";
-            throw new UnrecognisedTaskException(sunnyVoice.getException("unrecognised"));
+            throwUnrecognised(ui);
         }
 
         assert temp != null : "Task must exist before adding it to taskboard";
-        taskboard.addTask(temp);
-        storer.saveTasks(taskboard.getTasks());
+        writeTask(ui, temp);
+    }
 
-        ui.replyTask(temp);
+    private void writeTask(UI ui, Task temp) {
+        try {
+            storer.saveTasks(taskboard.getTasks());
+            taskboard.addTask(temp);
+            storer.saveTasks(taskboard.getTasks());
+            ui.replyTask(temp);
+        } catch (AccessDeniedException e) {
+            ui.replyError(e.getMessage());
+        } catch (IOException e) {
+            ui.replyError(e.getMessage());
+        }
+    }
+
+    private void executeHelp(UI ui, String[] parts) throws UnrecognisedTaskException {
+        if (parts.length > 1) {
+            throwUnrecognised(ui);
+        }
+        commandType = "find";
+        ui.replyHelp();
+    }
+
+    private void executeViewschedule(UI ui, String[] parts) throws InsufficientInfoException, TooManyKeywordsException, IncorrectDateFormatException {
+        checkAndThrowIfInsufficientParts(parts, ui);
+        checkIfTooManyKeywords(ui, parts);
+
+        Optional<LocalDateTime> keyDate = parser.parse(parts[1]);
+        checkIfDateIsIncorrectFormat(ui, keyDate);
+
+        ArrayList<Task> eventsInKeyDate = new ArrayList<>();
+        ArrayList<Task> deadlinesInKeyDate = new ArrayList<>();
+        for (Task task : taskboard.getTasks()) {
+            addTaskIfWithinDateRequirements(task, keyDate, deadlinesInKeyDate, eventsInKeyDate);
+        }
+        ui.replyViewSchedule(eventsInKeyDate, deadlinesInKeyDate);
+        commandType = "find";
+    }
+
+    private static void addTaskIfWithinDateRequirements(Task task, Optional<LocalDateTime> keyDate, ArrayList<Task> deadlinesInKeyDate, ArrayList<Task> eventsInKeyDate) {
+        if (task instanceof Deadline && ((Deadline) task).getBy() != null) {
+            boolean isKeyDateBeforeDeadline = !keyDate.get().isAfter(((Deadline) task).getBy());
+            if (isKeyDateBeforeDeadline) {
+                deadlinesInKeyDate.add(task);
+            }
+        }
+        else if (task instanceof Event && (((Event) task).getStart() != null && ((Event) task).getEnd() != null)) {
+            boolean isKeyDateAfterStart = !keyDate.get().isBefore(((Event) task).getStart());
+            boolean isKeyDateBeforeEnd = !keyDate.get().isAfter(((Event) task).getEnd());
+            if (isKeyDateBeforeEnd && isKeyDateAfterStart) {
+                eventsInKeyDate.add(task);
+            }
+        }
+    }
+
+    private void checkIfDateIsIncorrectFormat(UI ui, Optional<LocalDateTime> keyDate) throws IncorrectDateFormatException {
+        if (keyDate.isEmpty()) {
+            ui.setLastResponse(sunnyVoice.getException("incorrectDateFormat"));
+            commandType = "error";
+            throw new IncorrectDateFormatException(sunnyVoice.getException("incorrectDateFormat"));
+        }
+    }
+
+    private void executeFind(UI ui, String[] parts) throws InsufficientInfoException, TooManyKeywordsException {
+        checkAndThrowIfInsufficientParts(parts, ui);
+        checkIfTooManyKeywords(ui, parts);
+
+        String keyword = parts[1];
+        ArrayList<Task> foundTasks = new ArrayList<>();
+        for (Task task : taskboard.getTasks()) {
+            if (task.getDesc().contains(keyword)) {
+                foundTasks.add(task);
+            }
+        }
+
+        ui.replyFind(foundTasks);
+        commandType = "find";
+    }
+
+    private void checkIfTooManyKeywords(UI ui, String[] parts) throws TooManyKeywordsException {
+        if (parts.length > 2) {
+            ui.setLastResponse(sunnyVoice.getException("tooManyKeywords"));
+            commandType = "error";
+            throw new TooManyKeywordsException(sunnyVoice.getException("tooManyKeywords"));
+        }
+    }
+
+    private void executeDelete(UI ui, String[] parts) throws InsufficientInfoException, TaskOutOfBoundsException {
+        checkAndThrowIfInsufficientParts(parts, ui);
+
+        int index = getInputFromParts(parts, ui);
+        checkAndThrowMissingTask(ui, index);
+
+        Task temp = taskboard.getTask(index);
+        taskboard.removeTask(index);
+        writeTask(ui, temp);
+
+        ui.replyDelete(temp, index);
+        commandType = "delete";
+    }
+
+    private Task executeEvent(String input, UI ui, String[] parts) throws TaskEmptyDescException, InsufficientInfoException, IncorrectDateFormatException {
+        Task temp;
+        checkIfDescEmpty(parts, ui, "event");
+        int firstSlash = input.indexOf("/from");
+        int secondSlash = input.indexOf("/to");
+        if (firstSlash == -1 || secondSlash == -1 || firstSlash > secondSlash) {
+            throwInsufficient(ui);
+        }
+        String desc = input.substring(6, firstSlash);
+        String startString = input.substring(firstSlash + 5, secondSlash).trim();
+        String endString = input.substring(secondSlash + 3).trim();
+        Optional<LocalDateTime> startOpt = parser.parse(startString);
+        Optional<LocalDateTime> endOpt = parser.parse(endString);
+
+        if (startOpt.isPresent() && endOpt.isPresent()) {
+            if (startOpt.get().isAfter(endOpt.get())) {
+                throwInvalidDates(ui);
+            }
+            LocalDateTime startActual = startOpt.get();
+            LocalDateTime endActual = endOpt.get();
+            temp = new Event(desc, startActual, endActual, "", "");
+        } else if (startOpt.isPresent()) {
+            LocalDateTime startActual = startOpt.get();
+            temp = new Event(desc, startActual, null, "", endString);
+        } else if (endOpt.isPresent()) {
+            LocalDateTime endActual = endOpt.get();
+            temp = new Event(desc, null, endActual, startString, "");
+        } else {
+            temp = new Event(desc, null, null, startString, endString);
+        }
+
+        commandType = "task";
+        return temp;
+    }
+
+    private Task executeDeadline(String input, UI ui, String[] parts) throws TaskEmptyDescException, InsufficientInfoException {
+        Task temp;
+        checkIfDescEmpty(parts, ui, "deadline");
+        int slashIndex = input.indexOf("/by");
+        if (slashIndex == -1) {
+            throwInsufficient(ui);
+        }
+        String description = String.join(" ", input.substring(9, slashIndex)).trim();
+
+        String dateString = input.substring(slashIndex + 3).trim();
+        Optional<LocalDateTime> dateOpt = parser.parse(dateString);
+        commandType = "task";
+
+        if (dateOpt.isPresent()) {
+            LocalDateTime actualDate = dateOpt.get();
+            temp = new Deadline(description, actualDate, "");
+        } else {
+            temp = new Deadline(description, null, dateString);
+        }
+        return temp;
+    }
+
+    private Task executeTodo(String input, UI ui, String[] parts) throws TaskEmptyDescException {
+        checkIfDescEmpty(parts, ui, "todo");
+        Task temp = new ToDo(String.join(" ", input.substring(4)));
+        commandType = "task";
+        return temp;
+    }
+
+    private void executeUnmark(UI ui, String[] parts) throws InsufficientInfoException, TaskOutOfBoundsException {
+        checkAndThrowIfInsufficientParts(parts, ui);
+
+        int index = getInputFromParts(parts, ui);
+        checkAndThrowMissingTask(ui, index);
+
+        Task temp = taskboard.getTask(index);
+        if (!temp.isDone()) {
+            ui.replyAlreadyDone("unmarked", index);
+            commandType = "alreadyDone";
+        } else {
+            temp.unmark();
+            writeTask(ui, temp);
+            ui.replyUnmark(index);
+            commandType = "unmark";
+        }
+    }
+
+    private void executeMark(UI ui, String[] parts) throws InsufficientInfoException, TaskOutOfBoundsException {
+        Task temp;
+        checkAndThrowIfInsufficientParts(parts, ui);
+
+        int index = getInputFromParts(parts, ui);
+        checkAndThrowMissingTask(ui, index);
+
+        temp = taskboard.getTask(index);
+        if (temp.isDone()) {
+            ui.replyAlreadyDone("marked", index);
+            commandType = "alreadyDone";
+        } else {
+            temp.mark();
+            writeTask(ui, temp);
+            ui.replyMark(index);
+            commandType = "mark";
+        }
+    }
+
+    private void executeList(UI ui) {
+        ui.replyList();
+        commandType = "list";
+    }
+
+    private void executeBye(UI ui) {
+        ui.replyGoodbye();
+        commandType = "goodbye";
     }
 
     /**
@@ -261,11 +329,21 @@ public class UserParser {
         commandType = text;
     }
 
-    private void checkIfInsufficient(String[] parts, UI ui) throws InsufficientInfoException {
+    private void throwInvalidDates(UI ui) throws IncorrectDateFormatException{
+        ui.setLastResponse(sunnyVoice.getException("startAfterEnd"));
+        commandType = "error";
+        throw new IncorrectDateFormatException(sunnyVoice.getException("startAfterEnd"));
+    }
+
+    private void throwUnrecognised(UI ui) throws UnrecognisedTaskException {
+        ui.setLastResponse(sunnyVoice.getException("unrecognised"));
+        commandType = "error";
+        throw new UnrecognisedTaskException(sunnyVoice.getException("unrecognised"));
+    }
+
+    private void checkAndThrowIfInsufficientParts(String[] parts, UI ui) throws InsufficientInfoException {
         if (parts.length == 1){
-            ui.setLastResponse(sunnyVoice.getException("insufficient"));
-            commandType = "error";
-            throw new InsufficientInfoException(sunnyVoice.getException("insufficient"));
+            throwInsufficient(ui);
         }
     }
 
@@ -275,10 +353,12 @@ public class UserParser {
         throw new InsufficientInfoException(sunnyVoice.getException("insufficient"));
     }
 
-    private void throwMissingTask(UI ui) throws TaskOutOfBoundsException{
-        ui.setLastResponse(sunnyVoice.getException("missingTask"));
-        commandType = "error";
-        throw new TaskOutOfBoundsException(sunnyVoice.getException("missingTask"));
+    private void checkAndThrowMissingTask(UI ui, int i) throws TaskOutOfBoundsException{
+        if (!isIndexValid(i)) {
+            ui.setLastResponse(sunnyVoice.getException("missingTask"));
+            commandType = "error";
+            throw new TaskOutOfBoundsException(sunnyVoice.getException("missingTask"));
+        }
     }
 
     private int getInputFromParts(String[] parts, UI ui) throws NumberFormatException {
@@ -291,7 +371,7 @@ public class UserParser {
         }
     }
 
-    private boolean validateIndex(int index) {
+    private boolean isIndexValid(int index) {
         return index >= 0 && index < taskboard.getTaskCount() && taskboard.getTask(index) != null;
     }
 

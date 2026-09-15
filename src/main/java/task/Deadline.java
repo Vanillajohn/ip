@@ -9,7 +9,7 @@ import java.time.format.DateTimeFormatter;
  */
 public class Deadline extends Task {
     protected LocalDateTime by;
-    protected String notDate;
+    protected String invalidBy;
     private final DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HHmm");
 
     /**
@@ -18,12 +18,12 @@ public class Deadline extends Task {
      *
      * @param description the task's description.
      * @param by the due date as a LocalDateTime object, or null if it is stored as a String.
-     * @param notDate the due date as a String, or an empty String if it is stored as a LocalDateTime.
+     * @param invalidBy the due date as a String, or an empty String if it is stored as a LocalDateTime.
      */
-    public Deadline(String description, LocalDateTime by, String notDate) {
+    public Deadline(String description, LocalDateTime by, String invalidBy) {
         super(description);
         this.by = by;
-        this.notDate = notDate;
+        this.invalidBy = invalidBy;
     }
 
     /**
@@ -42,10 +42,10 @@ public class Deadline extends Task {
      * @return the task as a String in the format: "|due date (as a LocalDateTime or String)|status."
      */
     public String getFileFormat(){
-        if (this.notDate.equals("")){
-            return " | " + this.by.format(customFormatter) + " | " + (this.isDone() ? "1" : "0");
+        if (this.by == null){
+            return " | " + this.invalidBy + " | " + (this.isDone() ? "1" : "0");
         } else {
-            return " | " + this.notDate + " | " + (this.isDone() ? "1" : "0");
+            return " | " + this.by.format(customFormatter) + " | " + (this.isDone() ? "1" : "0");
         }
     }
 
@@ -59,10 +59,10 @@ public class Deadline extends Task {
      */
     @Override
     public String toString() {
-        if (this.notDate.equals("")){
-            return "[D]" + super.toString() + " (by: " + this.by.format(customFormatter) + ")";
+        if (this.by == null){
+            return "[D]" + super.toString() + " (by: " + this.invalidBy + ")";
         } else {
-            return "[D]" + super.toString() + " (by: " + this.notDate + ")";
+            return "[D]" + super.toString() + " (by: " + this.by.format(customFormatter) + ")";
         }
     }
 }

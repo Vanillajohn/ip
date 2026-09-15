@@ -50,13 +50,11 @@ public class Sunny {
                          IncorrectDateFormatException e) {
                         ui.setLastResponse(e.getMessage());
                         return ui.getLastResponse();
-                }
-                catch (NumberFormatException e) { //if something other than an integer was used, or the integer is too large/small
+                } catch (NumberFormatException e) { //if something other than an integer was used, or the integer is too large/small
                         ui.setLastResponse(sunnyVoice.getException("notInteger"));
                         parser.setCommandType("error");
                         return ui.getLastResponse();
-                } //no catch for out of bounds to see if code was the issue rather than user
-                catch (SunnyException e) {
+                } catch (SunnyException e) { //no catch for out of bounds to see if code was the issue rather than user
                         parser.setCommandType("error");
                         throw new RuntimeException(e);
                 }

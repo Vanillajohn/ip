@@ -13,19 +13,33 @@ import sunny.Sunny;
  */
 public class Main extends Application {
 
-    private Sunny sunny = new Sunny();
-
     @Override
     public void start(Stage stage) {
         try {
+            Sunny sunny = new Sunny();
             FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/view/MainWindow.fxml"));
             AnchorPane ap = fxmlLoader.load();
             Scene scene = new Scene(ap);
             stage.setScene(scene);
-            fxmlLoader.<MainWindow>getController().setSunny(sunny);  // inject the Duke instance
+            fxmlLoader.<MainWindow>getController().setSunny(sunny);  // inject Sunny
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (NoClassDefFoundError e) { //if any class is missing
+            showFatalError();
         }
+    }
+
+    /**
+     * Creates a small window telling the user that the app is broken.
+     */
+    private static void showFatalError() {
+        javax.swing.JOptionPane.showMessageDialog(
+                null,
+                "Hey, genius! I could not start because a required component is missing!\n"
+                        + "Please reinstall the application. Or don't. It's not like I care, or anything.",
+                "Sunny - Fatal Error",
+                javax.swing.JOptionPane.ERROR_MESSAGE
+        );
     }
 }

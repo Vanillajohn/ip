@@ -6,7 +6,7 @@ package task;
  */
 public class Task {
     protected String desc;
-    protected boolean marked = false;
+    protected boolean isMarked = false;
 
     /**
      * Constructs the task with the specific description.
@@ -23,7 +23,7 @@ public class Task {
      * @return "X" if the task is marked or " " if unmarked.
      */
     public String getStatusIcon() {
-        return (marked ? "X" : " ");
+        return (isMarked ? "X" : " ");
     }
 
     /**
@@ -39,14 +39,14 @@ public class Task {
      * Sets the task as marked.
      */
     public void mark(){
-        this.marked = true;
+        this.isMarked = true;
     }
 
     /**
      * Sets the task as unmarked.
      */
     public void unmark(){
-        this.marked = false;
+        this.isMarked = false;
     }
 
     /**
@@ -55,7 +55,7 @@ public class Task {
      * @return true if marked and false if unmarked.
      */
     public boolean isDone(){
-        return marked;
+        return isMarked;
     }
 
     /**

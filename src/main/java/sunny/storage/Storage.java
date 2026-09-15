@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -48,15 +49,18 @@ public class Storage {
      *
      * @param tasks the taskboard as an ArrayList<Task> to write into a file.
      */
-    public void saveTasks(ArrayList<Task> tasks) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+    public void saveTasks(ArrayList<Task> tasks) throws AccessDeniedException {
+        Path path = Paths.get(filePath);
+        try (BufferedWriter writer = Files.newBufferedWriter(path)) {
 
             for (Task task : tasks) {
                 writer.write(convertTaskToFileFormat(task));
                 writer.newLine();
             }
+        } catch (AccessDeniedException e) {
+            throw new AccessDeniedException("What do you mean 'Access Denied?' I can't write to your data file!");
         } catch (IOException e) {
-            System.out.println("Error saving tasks: " + e.getMessage());
+            System.out.println("Huh, there's some error saving tasks: " + e.getMessage());
         }
     }
 
@@ -69,11 +73,9 @@ public class Storage {
     private static String convertTaskToFileFormat(Task task) {
         if (task instanceof ToDo) {
             return "T | " + task.getDesc() + " | " + (task.isDone() ? "1" : "0");
-        }
-        if (task instanceof Deadline deadline) {
+        } else if (task instanceof Deadline deadline) {
             return "D | " + deadline.getDesc() + deadline.getFileFormat();
-        }
-        if (task instanceof Event event) {
+        } else if (task instanceof Event event) {
             return "E | " + event.getDesc() + event.getFileFormat();
         }
         assert false : "Tasks must be ToDo, Deadline or Event";
@@ -126,77 +128,81 @@ public class Storage {
         }
 
         String type = parts[0];
-        switch (type) {
-            case "T":
-                if (parts.length != 3) {
-                    throw new IllegalArgumentException("Invalid ToDo format");
-                }
-                if (!parts[2].equals("0") && !parts[2].equals("1")) {
-                    throw new IllegalArgumentException("Invalid completion status");
-                }
-                ToDo todo = new ToDo(parts[1]);
+        return switch (type) {
+            case "T" -> convertToDoFromFileFormat(parts);
+            case "D" -> convertDeadlineFromFileFormat(parts);
+            case "E" -> convertEventFromFileFormat(parts);
+            default -> throw new IllegalArgumentException("Unknown task type");
+        };
+    }
 
-                if (parts[2].equals("1")) {
-                    todo.mark();
-                }
-                return todo;
+    private static Event convertEventFromFileFormat(String[] parts) {
+        checkIfValidFormat(parts, 5);
+        Event event;
 
-            case "D":
-                if (parts.length != 4) {
-                    throw new IllegalArgumentException("Invalid Deadline format");
-                }
-                if (!parts[3].equals("0") && !parts[3].equals("1")) {
-                    throw new IllegalArgumentException("Invalid completion status");
-                }
-                Deadline deadline = null;
+        Optional<LocalDateTime> startOpt = dateParser.parse(parts[2]);
+        Optional<LocalDateTime> endOpt = dateParser.parse(parts[3]);
 
-                Optional<LocalDateTime> dateOpt = dateParser.parse(parts[2]);
+        if (startOpt.isPresent() && endOpt.isPresent()) {
+            LocalDateTime startActual = startOpt.get();
+            LocalDateTime endActual = endOpt.get();
+            event = new Event(parts[1], startActual, endActual, "", "");
+        } else if (startOpt.isPresent()) {
+            LocalDateTime startActual = startOpt.get();
+            event = new Event(parts[1], startActual, null, "", parts[3]);
+        } else if (endOpt.isPresent()) {
+            LocalDateTime endActual = endOpt.get();
+            event = new Event(parts[1], null, endActual, parts[2], "");
+        } else {
+            event = new Event(parts[1], null, null, parts[2], parts[3]);
+        }
 
-                if (dateOpt.isPresent()) {
-                    LocalDateTime actualDate = dateOpt.get();
-                    deadline = new Deadline(parts[1], actualDate, "");
-                } else {
-                    deadline = new Deadline(parts[1], null, parts[2]);
-                }
+        if (parts[4].equals("1")) {
+            event.mark();
+        }
+        return event;
+    }
 
-                if (parts[3].equals("1")) {
-                    deadline.mark();
-                }
-                return deadline;
+    private static Deadline convertDeadlineFromFileFormat(String[] parts) {
+        checkIfValidFormat(parts, 4);
+        Deadline deadline;
 
-            case "E":
-                if (parts.length != 5) {
-                    throw new IllegalArgumentException("Invalid Event format");
-                }
-                if (!parts[4].equals("0") && !parts[4].equals("1")) {
-                    throw new IllegalArgumentException("Invalid completion status");
-                }
-                Event event = null;
+        Optional<LocalDateTime> dateOpt = dateParser.parse(parts[2]);
 
-                Optional<LocalDateTime> startOpt = dateParser.parse(parts[2]);
-                Optional<LocalDateTime> endOpt = dateParser.parse(parts[3]);
+        if (dateOpt.isPresent()) {
+            LocalDateTime actualDate = dateOpt.get();
+            deadline = new Deadline(parts[1], actualDate, "");
+        } else {
+            deadline = new Deadline(parts[1], null, parts[2]);
+        }
 
-                if (startOpt.isPresent() && endOpt.isPresent()) {
-                    LocalDateTime startActual = startOpt.get();
-                    LocalDateTime endActual = endOpt.get();
-                    event = new Event(parts[1], startActual, endActual, "", "");
-                } else if (startOpt.isPresent()) {
-                    LocalDateTime startActual = startOpt.get();
-                    event = new Event(parts[1], startActual, null, "", parts[3]);
-                } else if (endOpt.isPresent()) {
-                    LocalDateTime endActual = endOpt.get();
-                    event = new Event(parts[1], null, endActual, parts[2], "");
-                } else {
-                    event = new Event(parts[1], null, null, parts[2], parts[3]);
-                }
+        if (parts[3].equals("1")) {
+            deadline.mark();
+        }
+        return deadline;
+    }
 
-                if (parts[4].equals("1")) {
-                    event.mark();
-                }
-                return event;
+    private static ToDo convertToDoFromFileFormat(String[] parts) {
+        checkIfValidFormat(parts, 3);
+        ToDo todo = new ToDo(parts[1]);
 
-            default:
-                throw new IllegalArgumentException("Unknown task type");
+        if (parts[2].equals("1")) {
+            todo.mark();
+        }
+        return todo;
+    }
+
+    private static void checkIfValidFormat(String[] parts, int expectedPartsLength) {
+        if (parts.length != expectedPartsLength) {
+            switch(parts[0]) {
+                case "T" -> throw new IllegalArgumentException("Invalid ToDo format");
+                case "D" -> throw new IllegalArgumentException("Invalid Deadline format");
+                case "E" -> throw new IllegalArgumentException("Invalid Event format");
+                default -> throw new IllegalArgumentException("Invalid format");
+            }
+        }
+        if (!parts[expectedPartsLength - 1].equals("0") && !parts[expectedPartsLength - 1].equals("1")) {
+            throw new IllegalArgumentException("Invalid completion status");
         }
     }
 
