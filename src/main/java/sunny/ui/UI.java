@@ -43,15 +43,19 @@ public class UI {
     boolean isRunning = true;
     private String lastResponse;
 
+    private static void printBar() {
+        System.out.println("____________________________________________________________");
+    }
+
     /**
      * Prints a goodbye remark and sets isRunning to false, usually to exit the program
      * by stopping run().
      */
     public void replyGoodbye() {
         lastResponse = sunnyVoice.getText("goodbyes");
-        System.out.println("____________________________________________________________");
+        printBar();
         sunnyVoice.speak("goodbyes");
-        System.out.println("____________________________________________________________");
+        printBar();
         isRunning = false;
     }
 
@@ -61,13 +65,11 @@ public class UI {
      * If there are none, it just prints the remark.
      */
     public void replyList() {
+        printBar();
         if (taskboard.getTaskCount() == 0) {
-            System.out.println("____________________________________________________________");
             sunnyVoice.speak("noList");
-            System.out.println("____________________________________________________________");
             lastResponse = sunnyVoice.getText("noList");
         } else {
-            System.out.println("____________________________________________________________");
             sunnyVoice.speak("listRemarks");
             String response = "";
             int i = 0;
@@ -76,9 +78,9 @@ public class UI {
                 response += i + 1 + "." + taskboard.getTask(i) + "\n";
                 i += 1;
             }
-            System.out.println("____________________________________________________________");
             lastResponse = sunnyVoice.getText("listRemarks") + "\n" + response;
         }
+        printBar();
     }
 
     /**
@@ -88,10 +90,10 @@ public class UI {
      */
     public void replyMark(int index) {
         lastResponse = sunnyVoice.getText("taskMark") + "\n" + (index + 1) + "." + taskboard.getTask(index);
-        System.out.println("____________________________________________________________");
+        printBar();
         sunnyVoice.speak("taskMark");
         System.out.println(index + "." + taskboard.getTask(index));
-        System.out.println("____________________________________________________________");
+        printBar();
     }
 
     /**
@@ -101,10 +103,10 @@ public class UI {
      */
     public void replyUnmark(int index) {
         lastResponse = sunnyVoice.getText("taskUnmark") + "\n" + (index + 1) + "." + taskboard.getTask(index);
-        System.out.println("____________________________________________________________");
+        printBar();
         sunnyVoice.speak("taskUnmark");
         System.out.println(index + "." + taskboard.getTask(index));
-        System.out.println("____________________________________________________________");
+        printBar();
     }
 
     /**
@@ -115,10 +117,10 @@ public class UI {
     public void replyAlreadyDone(String task, int index) {
         List<String> remarks = sunnyVoice.getAlreadyDoneRemarks();
         lastResponse = remarks.get(0) + task + remarks.get(1) + "\n" + (index + 1) + "." + taskboard.getTask(index);
-        System.out.println("____________________________________________________________");
+        printBar();
         sunnyVoice.speak(remarks.get(0) + task + remarks.get(1));
         System.out.println(index + "." + taskboard.getTask(index));
-        System.out.println("____________________________________________________________");
+        printBar();
     }
 
     /**
@@ -127,23 +129,21 @@ public class UI {
      *
      * @param temp the task to be deleted.
      */
-    public void replyDelete(Task temp) {
+    public void replyDelete(Task temp, int i) {
+        printBar();
+        sunnyVoice.speak("deleting");
+        System.out.println("    " + (i + 1) + ". " + temp);
+        lastResponse = sunnyVoice.getText("deleting") + "\n" + "    " + (i + 1) + ". " + temp + "\n";
+
         if (taskboard.getTaskCount() == 0) {
-            lastResponse = sunnyVoice.getText("deleting") + "\n" + "    " + temp + "\n" + sunnyVoice.getText("noTasksLeft");
-            System.out.println("____________________________________________________________");
-            sunnyVoice.speak("deleting");
-            System.out.println("    " + temp);
+            lastResponse += sunnyVoice.getText("noTasksLeft");
             sunnyVoice.speak("noTasksLeft");
-            System.out.println("____________________________________________________________");
         } else {
             List<String> remarks = sunnyVoice.getListNumberRemarks();
-            lastResponse = sunnyVoice.getText("deleting") + "\n" + "    " + temp + "\n" + remarks.get(0) + taskboard.getTaskCount() + remarks.get(1);
-            System.out.println("____________________________________________________________");
-            sunnyVoice.speak("deleting");
-            System.out.println("    " + temp);
+            lastResponse += remarks.get(0) + taskboard.getTaskCount() + remarks.get(1);
             System.out.println(remarks.get(0) + taskboard.getTaskCount() + remarks.get(1));
-            System.out.println("____________________________________________________________");
         }
+        printBar();
     }
 
     /**
@@ -155,12 +155,12 @@ public class UI {
     public void replyTask(Task temp) {
         List<String> remarks = sunnyVoice.getListNumberRemarks();
         lastResponse = sunnyVoice.getText("taskAddRemarks") + "\n" + "    " + temp + "\n" + remarks.get(0) + taskboard.getTaskCount() + remarks.get(1);
-        System.out.println("____________________________________________________________");
+        printBar();
         sunnyVoice.speak("taskAddRemarks");
         System.out.println("    " + temp);
         System.out.println(remarks.get(0) + taskboard.getTaskCount() + remarks.get(1));
         sunnyVoice.speak("taskRemarks");
-        System.out.println("____________________________________________________________");
+        printBar();
     }
 
     /**
@@ -169,6 +169,7 @@ public class UI {
      * @param foundTask the tasks that contain the keyword.
      */
     public void replyFind(ArrayList<Task> foundTask) {
+        printBar();
         String response = "";
         int i = 0;
         while (i < foundTask.size()) {
@@ -177,67 +178,105 @@ public class UI {
             i += 1;
         }
         if (response.isEmpty()) {
-            System.out.println("____________________________________________________________");
             sunnyVoice.speak("noFoundTasks");
-            System.out.println("____________________________________________________________");
             lastResponse = sunnyVoice.getText("noFoundTasks");
         } else {
-            System.out.println("____________________________________________________________");
             sunnyVoice.speak("foundTasks");
-            System.out.println("____________________________________________________________");
             lastResponse = sunnyVoice.getText("foundTasks") + "\n" + response;
+        }
+        printBar();
+    }
+
+    /**
+     * Prints a list of Events and Deadlines, or a remark if either list is empty.
+     *
+     * @param events the list of Events to be printed.
+     * @param deadlines the list of Deadlines to be printed.
+     */
+    public void replyViewSchedule(ArrayList<Task> events, ArrayList<Task> deadlines) {
+        String response = "";
+        if (events.isEmpty() && deadlines.isEmpty()) {
+            replyNoEventsOrDeadlines();
+        } else if (events.isEmpty()) {
+            replyNoEventsHaveDeadlines(deadlines, response);
+        } else if (deadlines.isEmpty()) {
+            replyHaveEventsNoDeadlines(events, response);
+        } else {
+            replyHaveEventsHaveDeadlines(events, deadlines, response);
         }
     }
 
-    public void replyViewSchedule(ArrayList<Task> events, ArrayList<Task> deadlines) {
-        String response = "";
+    private void replyHaveEventsHaveDeadlines(ArrayList<Task> events, ArrayList<Task> deadlines, String response) {
         int i = 1;
         int j = 1;
-        if (events.isEmpty() && deadlines.isEmpty()) {
-            System.out.println("____________________________________________________________");
-            sunnyVoice.speak("noEvents");
-            sunnyVoice.speak("noDeadlines");
-            System.out.println("____________________________________________________________");
-            lastResponse = sunnyVoice.getText("noEvents") + "\n" + sunnyVoice.getText("noDeadlines");
-        } else if (events.isEmpty()) {
-            System.out.println("____________________________________________________________");
-            sunnyVoice.speak("noEvents");
-            response += sunnyVoice.getText("haveDeadlines") + "\n";
-            for (Task deadline : deadlines) {
-                System.out.println(j + "." + deadline);
-                response += j + "." + deadline + "\n";
-                j += 1;
-            }
-            System.out.println("____________________________________________________________");
-            lastResponse = sunnyVoice.getText("noEvents") + "\n" + response;
-        } else if (deadlines.isEmpty()) {
-            System.out.println("____________________________________________________________");
-            response += sunnyVoice.getText("haveEvents") + "\n";
-            for (Task event : events) {
-                System.out.println(i + "." + event);
-                response += i + "." + event + "\n";
-                i += 1;
-            }
-            sunnyVoice.speak("noDeadlines");
-            System.out.println("____________________________________________________________");
-            lastResponse = response + "\n" + sunnyVoice.getText("noDeadlines");
-        } else {
-            System.out.println("____________________________________________________________");
-            response += sunnyVoice.getText("haveEvents") + "\n";
-            for (Task event : events) {
-                System.out.println(i + "." + event);
-                response += i + "." + event + "\n";
-                i += 1;
-            }
-            response += sunnyVoice.getText("haveDeadlines") + "\n";
-            for (Task deadline : deadlines) {
-                System.out.println(j + "." + deadline);
-                response += j + "." + deadline + "\n";
-                j += 1;
-            }
-            System.out.println("____________________________________________________________");
-            lastResponse = response;
+        printBar();
+        response += sunnyVoice.getText("haveEvents") + "\n";
+        for (Task event : events) {
+            System.out.println(i + "." + event);
+            response += i + "." + event + "\n";
+            i += 1;
         }
+        response += sunnyVoice.getText("haveDeadlines") + "\n";
+        for (Task deadline : deadlines) {
+            System.out.println(j + "." + deadline);
+            response += j + "." + deadline + "\n";
+            j += 1;
+        }
+        printBar();
+        lastResponse = response;
+    }
+
+    private void replyHaveEventsNoDeadlines(ArrayList<Task> events, String response) {
+        int i = 1;
+        printBar();
+        response += sunnyVoice.getText("haveEvents") + "\n";
+        for (Task event : events) {
+            System.out.println(i + "." + event);
+            response += i + "." + event + "\n";
+            i += 1;
+        }
+        sunnyVoice.speak("noDeadlines");
+        printBar();
+        lastResponse = response + "\n" + sunnyVoice.getText("noDeadlines");
+    }
+
+    private void replyNoEventsHaveDeadlines(ArrayList<Task> deadlines, String response) {
+        int i = 1;
+        printBar();
+        sunnyVoice.speak("noEvents");
+        response += sunnyVoice.getText("haveDeadlines") + "\n";
+        for (Task deadline : deadlines) {
+            System.out.println(i + "." + deadline);
+            response += i + "." + deadline + "\n";
+            i += 1;
+        }
+        printBar();
+        lastResponse = sunnyVoice.getText("noEvents") + "\n" + response;
+    }
+
+    private void replyNoEventsOrDeadlines() {
+        printBar();
+        sunnyVoice.speak("noEvents");
+        sunnyVoice.speak("noDeadlines");
+        printBar();
+        lastResponse = sunnyVoice.getText("noEvents") + "\n" + sunnyVoice.getText("noDeadlines");
+    }
+
+    /**
+     * Prints a list of the available commands.
+     */
+    public void replyHelp() {
+        printBar();
+        sunnyVoice.speak("help");
+        lastResponse = sunnyVoice.getText("help");
+        printBar();
+    }
+
+    public void replyError(String e) {
+        printBar();
+        System.out.println(e);
+        lastResponse = e;
+        printBar();
     }
 
     /**
@@ -259,18 +298,16 @@ public class UI {
             catch (UnrecognisedTaskException | TaskEmptyDescException | InsufficientInfoException |
                    TooManyTasksException | TaskOutOfBoundsException | TooManyKeywordsException |
                    IncorrectDateFormatException e) {
-                System.out.println("____________________________________________________________");
+                printBar();
                 System.out.println(e.getMessage());
-                System.out.println("____________________________________________________________");
+                printBar();
                 lastResponse = e.getMessage();
-            }
-            catch (NumberFormatException e) { //if something other than an integer was used, or the integer is too large/small
-                System.out.println("____________________________________________________________");
+            } catch (NumberFormatException e) { //if something other than an integer was used, or the integer is too large/small
+                printBar();
                 sunnyVoice.speak("notInteger");
-                System.out.println("____________________________________________________________");
+                printBar();
                 lastResponse = sunnyVoice.getText("notInteger");
-            } //no catch for out of bounds to see if code was the issue rather than user
-            catch (SunnyException e) {
+            } catch (SunnyException e) { //no catch for out of bounds to see if code was the issue rather than user
                 throw new RuntimeException(e);
             }
         }

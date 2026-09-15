@@ -120,6 +120,48 @@ public class SunnyVoice {
     List<String> noDeadlines = List.of(
             "Huh, no deadlines. Sure you inputted all your tasks correctly, you idiot?",
             "A lack of deadlines is probably a lack of productivity, or a misinput!");
+    List<String> startAfterEnd = List.of("Start date after the end date? Breaking spacetime, are we?",
+            "Dude, you can't time travel. Your start date can't be after your end date.");
+    List<String> help = List.of("""
+            You've gotta be kidding me\s
+            -----------------------------------------\s
+            All commands are case insensitive.\s
+            Valid date formats are DD/MM/YYYY HHMM, DD-MM-YYYY HHMM or either format without HHMM behind.\s
+            "Tomorrow" can be a date, but without any numbers, nothing I can do to compare it with others.\s
+            \s
+            The commands I care about are:\s
+            - "Todo <description>" - creates a ToDo task with a description.\s
+            - "Deadline <description> /by <date>" - creates a Deadline task with a description and deadline (shocker).\s
+            - "Event <description> /from <date> /to <date>" - creates an Event task with a description, start date and end date.\s
+            - "List" - Lists all tasks. Duh.\s
+            - "Delete <index>" - deletes the task at the index.\s
+            - "Mark <index>" - figuring this out is left as an exercise for the user.\s
+            - "Unmark <index>" - unmarks the task at the index.\s
+            - "Find <one keyword>" - displays tasks with that ONE keyword in the description.\s
+            - "Viewschedule <date>" - displays Events if the date is between the task's start and end date, and Deadlines if the date is before its date.\s
+            - "help" - This, oh, I dunno, displays this list?\s
+            - "Bye" - What do you think?\s
+            """,
+            """
+            What. Did you even read the user guide?\s
+            -----------------------------------------\s
+            Commands are case insensitive.\s
+            Valid date formats are DD/MM/YYYY HHMM, DD-MM-YYYY HHMM or either format without HHMM behind.\s
+            You can use "Tomorrow" as a date but I'm won't compare it with others!\s
+            \s
+            The commands my stupid developer bothered to code in are:\s
+            - "Todo <description>" - creates a ToDo task with a description.\s
+            - "Deadline <description> /by <date>" - creates a Deadline task with a description and deadline (no way).\s
+            - "Event <description> /from <date> /to <date>" - creates an Event task with a description, start date and end date.\s
+            - "List" - I wonder what the command LIST does. Perhaps it LISTs every task, as obviously described. Hmm.\s
+            - "Delete <index>" - deletes the task at the index.\s
+            - "Mark <index>" - marks the task at the index.\s
+            - "Unmark <index>" - surely you can infer this.\s
+            - "Find <one keyword>" - displays tasks with that keyword in the description. Don't even try to give me two.\s
+            - "Viewschedule <date>" - displays Events if the date is between the task's start and end date, and Deadlines if the date is before its date.\s
+            - "help" - take a wild guess.\s
+            - "Bye" - Take another wild guess.\s
+            """);
 
     private Random rand = new Random();
 
@@ -165,6 +207,8 @@ public class SunnyVoice {
                 return getExceptionHelper(tooManyKeywordsRemarks);
             case "incorrectDateFormat":
                 return getExceptionHelper(incorrectDateFormat);
+            case "startAfterEnd":
+                return getExceptionHelper(startAfterEnd);
         }
         return "The input text is wrong, you dumb developer!";
     }
@@ -233,6 +277,12 @@ public class SunnyVoice {
             case "noDeadlines":
                 speakHelper(noDeadlines);
                 break;
+            case "help":
+                speakHelper(help);
+                break;
+            case "startAfterEnd":
+                speakHelper(startAfterEnd);
+                break;
             default:
                 System.out.println("The input text is wrong, you dumb developer!");
         }
@@ -278,6 +328,10 @@ public class SunnyVoice {
                 return getTextHelper(noEvents);
             case "noDeadlines":
                 return getTextHelper(noDeadlines);
+            case "help":
+                return getTextHelper(help);
+            case "startAfterEnd":
+                return getTextHelper(startAfterEnd);
         }
         return "The input text is wrong, you dumb developer!";
     }

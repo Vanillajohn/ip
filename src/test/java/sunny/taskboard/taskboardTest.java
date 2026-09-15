@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import task.Task;
 import task.ToDo;
 
-public class taskboardTest {
+public class TaskboardTest {
     private Taskboard taskboard = Taskboard.getInstance();
 
     @BeforeEach
@@ -28,7 +28,6 @@ public class taskboardTest {
         Task task = new ToDo("buy milk");
 
         taskboard.addTask(task);
-        taskboard.updateTaskCount(1);
 
         assertEquals(1, taskboard.getTaskCount());
     }
@@ -38,7 +37,6 @@ public class taskboardTest {
         Task task = new ToDo("buy milk");
 
         taskboard.addTask(task);
-        taskboard.updateTaskCount(1);
 
         assertEquals(task, taskboard.getTask(0));
     }
@@ -49,10 +47,8 @@ public class taskboardTest {
         Task second = new ToDo("do homework");
 
         taskboard.addTask(first);
-        taskboard.updateTaskCount(1);
 
         taskboard.addTask(second);
-        taskboard.updateTaskCount(1);
 
         assertEquals(2, taskboard.getTaskCount());
         assertEquals(first, taskboard.getTask(0));
@@ -65,13 +61,10 @@ public class taskboardTest {
         Task second = new ToDo("do homework");
 
         taskboard.addTask(first);
-        taskboard.updateTaskCount(1);
 
         taskboard.addTask(second);
-        taskboard.updateTaskCount(1);
 
         taskboard.removeTask(0);
-        taskboard.updateTaskCount(-1);
 
         assertEquals(1, taskboard.getTaskCount());
         assertEquals(second, taskboard.getTask(0));
@@ -83,10 +76,8 @@ public class taskboardTest {
         Task second = new ToDo("do homework");
 
         taskboard.addTask(first);
-        taskboard.updateTaskCount(1);
 
         taskboard.addTask(second);
-        taskboard.updateTaskCount(1);
 
         assertEquals(2, taskboard.getTasks().size());
         assertEquals(first, taskboard.getTasks().get(0));
@@ -122,27 +113,11 @@ public class taskboardTest {
         Task task = new ToDo("test");
 
         taskboard.addTask(task);
-        taskboard.updateTaskCount(1);
 
         assertThrows(
                 IndexOutOfBoundsException.class,
                 () -> taskboard.getTask(1)
         );
-    }
-
-    @Test
-    public void setTaskCountIncreasesCount() {
-        taskboard.updateTaskCount(3);
-
-        assertEquals(3, taskboard.getTaskCount());
-    }
-
-    @Test
-    public void setTaskCountCanDecreaseCount() {
-        taskboard.updateTaskCount(3);
-        taskboard.updateTaskCount(-1);
-
-        assertEquals(2, taskboard.getTaskCount());
     }
 
     @Test
