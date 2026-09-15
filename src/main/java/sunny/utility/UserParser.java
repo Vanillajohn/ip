@@ -98,13 +98,24 @@ public class UserParser {
         }
 
         assert temp != null : "Task must exist before adding it to taskboard";
-        writeTask(ui, temp);
+        writeAndSaveTask(ui, temp);
     }
 
-    private void writeTask(UI ui, Task temp) {
+    private void writeAndSaveTask(UI ui, Task temp) {
         try {
             storer.saveTasks(taskboard.getTasks());
             taskboard.addTask(temp);
+            storer.saveTasks(taskboard.getTasks());
+            ui.replyTask(temp);
+        } catch (AccessDeniedException e) {
+            ui.replyError(e.getMessage());
+        } catch (IOException e) {
+            ui.replyError(e.getMessage());
+        }
+    }
+
+    private void saveTask(UI ui, Task temp) {
+        try {
             storer.saveTasks(taskboard.getTasks());
             ui.replyTask(temp);
         } catch (AccessDeniedException e) {
@@ -194,7 +205,7 @@ public class UserParser {
 
         Task temp = taskboard.getTask(index);
         taskboard.removeTask(index);
-        writeTask(ui, temp);
+        saveTask(ui, temp);
 
         ui.replyDelete(temp, index);
         commandType = "delete";
@@ -276,7 +287,7 @@ public class UserParser {
             commandType = "alreadyDone";
         } else {
             temp.unmark();
-            writeTask(ui, temp);
+            saveTask(ui, temp);
             ui.replyUnmark(index);
             commandType = "unmark";
         }
@@ -295,7 +306,7 @@ public class UserParser {
             commandType = "alreadyDone";
         } else {
             temp.mark();
-            writeTask(ui, temp);
+            saveTask(ui, temp);
             ui.replyMark(index);
             commandType = "mark";
         }

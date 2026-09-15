@@ -26,8 +26,7 @@ public class SunnyVoice {
     List<String> greetings = List.of(
             "Yeah, it's me, Sunny☀.\nHow can I annoy you today?",
             "What now?\nCan you go bother someone else?",
-            "It's me, Sunny☀! \nNow can you do me a favour and buzz off?",
-            "It's me, Sunny☀! \nHow ironic.☀☀☀");
+            "It's me, Sunny☀! \nNow can you do me a favour and buzz off?");
     List<String> goodbyes = List.of(
             "Don't tell anyone I helped you, got it?",
             "I can't believe I get worried when I'm not there to help you.",
