@@ -122,6 +122,11 @@ public class SunnyVoice {
             "A lack of deadlines is probably a lack of productivity, or a misinput!");
     List<String> startAfterEnd = List.of("Start date after the end date? Breaking spacetime, are we?",
             "Dude, you can't time travel. Your start date can't be after your end date.");
+    List<String> titles = List.of("Ughhh!",
+            "Hmpf!",
+            "Right now?? I almost finished some work and now I need to respond to you? Are you kidding me? Couldn't you " +
+                    "have waited until a little while longer before you disturb me? It'd be a different story if I enjoy " +
+                    "hanging out with you, but I totally don't! Ridiculous!");
     List<String> help = List.of("""
             You've gotta be kidding me\s
             -----------------------------------------\s
@@ -332,6 +337,8 @@ public class SunnyVoice {
                 return getTextHelper(help);
             case "startAfterEnd":
                 return getTextHelper(startAfterEnd);
+            case "titles":
+                return getTextHelper(titles);
         }
         return "The input text is wrong, you dumb developer!";
     }

@@ -36,6 +36,13 @@ public class Sunny {
         }
 
         /**
+         * Returns the text needed for the window title.
+         *
+         * @return the window's title.
+         */
+        public String getTitle() { return sunnyVoice.getText("titles"); }
+
+        /**
          * The main method the application uses to get the chatbot's response.
          *
          * @param input the user's input as a String.
