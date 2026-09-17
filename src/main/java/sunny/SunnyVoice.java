@@ -26,11 +26,14 @@ public class SunnyVoice {
     List<String> greetings = List.of(
             "Yeah, it's me, Sunny☀.\nHow can I annoy you today?",
             "What now?\nCan you go bother someone else?",
-            "It's me, Sunny☀! \nNow can you do me a favour and buzz off?");
+            "It's me, Sunny☀! \nNow can you do me a favour and buzz off?",
+            "Oh my gosh, can you go install someone else's JAR?",
+            "Would you ask for my help if I was a worm? \nI sure hope not.");
     List<String> goodbyes = List.of(
             "Don't tell anyone I helped you, got it?",
             "I can't believe I get worried when I'm not there to help you.",
-            "Jeez, you really depend on me, don't you?");
+            "Jeez, you really depend on me, don't you?",
+            "Ugh, I might actually be getting comfortable with this.");
     List<String> taskRemarks = List.of(
             "I'm only helping you because you now owe me.",
             "I could be doing so much more right now.",
@@ -39,10 +42,12 @@ public class SunnyVoice {
             "I'd better not see my name in any of these.");
     List<String> taskMarkRemarks = List.of(
             "Yeah, yeah. Marked it already",
+            "If it's done, why don't you just delete it?",
             "Done. Can you leave me alone now?",
             "You better help me when I need it!");
     List<String> taskUnmarkRemarks = List.of(
             "Can't you unmark this yourself?",
+            "How do you UNDO something you finished?",
             "Done. Can you leave me alone now?",
             "You better help me when I need it!");
     List<String> listRemarks = List.of(
@@ -51,7 +56,8 @@ public class SunnyVoice {
             "☀☀List deleted☀☀. Kidding. Here you go:");
     List<List<String>> listNumberRemarks = List.of(
             List.of("Now you have ", " tasks in your list. Whoop de doo."),
-            List.of("Go do your ", " tasks already!"));
+            List.of("Go do your ", " tasks already!"),
+            List.of("Why're you talking to me when you have ", " tasks to do?"));
     List<String> taskAddRemarks = List.of(
             "Task added. Can I go now?",
             "Task added. Appreciation assumed, accepted and ignored.",
@@ -66,7 +72,8 @@ public class SunnyVoice {
             "Say something weird again and Sunny's gonna get Stormy.");
     List<String> insufficientRemarks = List.of(
             "Very funny. Not enough info and I won't help you!",
-            "You didn't give me enough info! Don't test me!");
+            "You didn't give me enough info! Don't test me!",
+            "Hey genius, your command lacks sufficient information for me to work with!");
     List<String> tooManyRemarks = List.of(
             "Your taskboard can only hold so many!",
             "I can't add any more!",
@@ -74,15 +81,17 @@ public class SunnyVoice {
     List<String> deletingRemarks = List.of(
             "If you want this deleted, why did you add it?",
             "I've added it and now you want me to remove it?",
-            "Now I'm DELETING for you too?");
+            "Now I'm DELETING for you too?",
+            "Why don't YOU remove it from the data file yourself!");
     List<String> missingTaskRemarks = List.of(
             "There's no task there!",
             "I ain't doing anything if nothing's there!",
             "Do you need your scanner checked? That index has no task!",
-            "How is it that you see worse with two eyes than I, with none?");
+            "There's nothing there! How is it that you see worse with two eyes than I, with none?");
     List<String> notIntegerRemarks = List.of(
             "I need a VALID INTEGER doofus!",
-            "You're in CS and you don't know what a VALID INTEGER is?");
+            "You're in CS and you don't know what a VALID INTEGER is?",
+            "Read the user guide? Clearly not. V-A-L-I-D Integer!");
     List<String> tooManyKeywordsRemarks = List.of(
             "If you've got more than one keyword, search it yourself!",
             "I'll tolerate at most one keyword!",
@@ -94,34 +103,46 @@ public class SunnyVoice {
             "Are these what you're looking for? I sure hope not.");
     List<List<String>> alreadyDoneRemarks = List.of(
             List.of("It's already ",". Are you blind or something?"),
-            List.of("Did you forget I've "," it already? No wonder you need a taskboard."));
+            List.of("Did you forget I've "," it already? No wonder you need a taskboard."),
+            List.of("Huh? That task was ", " already! No wonder you need my help managing everything!"));
     List<String> noFoundTasksRemarks = List.of(
             "Can't find anything. You'd better not be wasting my time with misinputs!",
-            "There isn't anything with that keyword. This isn't some excuse to spend time with me, is it?");
+            "There isn't anything with that keyword. This isn't some excuse to spend time with me, is it?",
+            "Seems like nothing matches with those keywords. I could be pulling your leg, or you could've spelled something wrongly!");
     List<String> noListRemarks = List.of(
             "Your list's empty. Are you procrastinating or just plain lazy?",
-            "Wow. No tasks. Shocker. I'm appalled.");
+            "Wow. No tasks. Shocker. I'm appalled.",
+            "There's no tasks on the board. Forgot to add some, didn't ya?");
     List<String> noTasksLeft = List.of(
             "That was your last task. I can go now, right?",
-            "Your list is empty now. I'm shaking with excitement.");
+            "Your list is empty now. I'm shaking with excitement.",
+            "Finally. No more tasks left. I can forcibly close this window now, right? ");
     List<String> incorrectDateFormat = List.of(
-            "Aww, look who can't give a date in dd/mm/yyyy or dd-mm-yyyy format!",
-            "The only date I'm interested in has the format dd/mm/yyyy or dd-mm-yyyy!");
+            "Aww, look who can't give a date in minimally dd/mm/yyyy or dd-mm-yyyy format!",
+            "The only date I'm interested in has the format dd/mm/yyyy or dd-mm-yyyy!",
+            "Seems like you don't know what a valid date format is. Seems like I don't care to share. Go check the User Guide!");
     List<String> haveEvents = List.of(
             "Well aren't you busy with all these tasks on that day:",
-            "I'm DEFINITELY not bummed that I can't see you that day with these tasks:");
+            "I'm DEFINITELY not bummed that I can't see you that day with these tasks:",
+            "Got some events on that day, so I can't see you. Sad? Gosh I hope not.");
     List<String> haveDeadlines = List.of(
             "By the way, you still have deadlines due:",
-            "Don't forget about these deadlines, you nimrod:");
+            "Don't forget about these deadlines, you nimrod:",
+            "I don't care much...but there's some deadlines you might've forgotten about:");
     List<String> noEvents = List.of(
             "Nothing's happening on that day. Sure you didn't input a task wrongly, you dummy?",
-            "Seems like you're free that day. And yes, I DON'T want to see you either!");
+            "Seems like you're free that day. And yes, I DON'T want to see you either!",
+            "No events on that day. With how dumb you can get, you might want to double check that!");
     List<String> noDeadlines = List.of(
             "Huh, no deadlines. Sure you inputted all your tasks correctly, you idiot?",
-            "A lack of deadlines is probably a lack of productivity, or a misinput!");
-    List<String> startAfterEnd = List.of("Start date after the end date? Breaking spacetime, are we?",
-            "Dude, you can't time travel. Your start date can't be after your end date.");
-    List<String> titles = List.of("Ughhh!",
+            "A lack of deadlines is probably a lack of productivity, or a misinput!",
+            "There's no deadlines to take note of. You might wanna double check that, knowing how dumb you can be!");
+    List<String> startAfterEnd = List.of(
+            "Start date after the end date? Breaking spacetime, are we?",
+            "Dude, you can't time travel. Your start date can't be after your end date!",
+            "Do you need to retake elementary? Start dates can't possibly be after end dates!");
+    List<String> titles = List.of(
+            "Ughhh!",
             "Hmpf!",
             "Right now?? I almost finished some work and now I need to respond to you? Are you kidding me? Couldn't you " +
                     "have waited until a little while longer before you disturb me? It'd be a different story if I enjoy " +

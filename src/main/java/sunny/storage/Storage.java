@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
@@ -138,58 +137,66 @@ public class Storage {
 
     private static Event convertEventFromFileFormat(String[] parts) {
         checkIfValidFormat(parts, 5);
-        Event event;
 
+        Event event = parseDatesAndCreateEvent(parts);
+
+        checkAndMark(event, parts, 4);
+
+        return event;
+    }
+
+    private static Event parseDatesAndCreateEvent(String[] parts) {
         Optional<LocalDateTime> startOpt = dateParser.parse(parts[2]);
         Optional<LocalDateTime> endOpt = dateParser.parse(parts[3]);
 
         if (startOpt.isPresent() && endOpt.isPresent()) {
             LocalDateTime startActual = startOpt.get();
             LocalDateTime endActual = endOpt.get();
-            event = new Event(parts[1], startActual, endActual, "", "");
+            return new Event(parts[1], startActual, endActual, "", "");
         } else if (startOpt.isPresent()) {
             LocalDateTime startActual = startOpt.get();
-            event = new Event(parts[1], startActual, null, "", parts[3]);
+            return new Event(parts[1], startActual, null, "", parts[3]);
         } else if (endOpt.isPresent()) {
             LocalDateTime endActual = endOpt.get();
-            event = new Event(parts[1], null, endActual, parts[2], "");
+            return new Event(parts[1], null, endActual, parts[2], "");
         } else {
-            event = new Event(parts[1], null, null, parts[2], parts[3]);
+            return new Event(parts[1], null, null, parts[2], parts[3]);
         }
-
-        if (parts[4].equals("1")) {
-            event.mark();
-        }
-        return event;
     }
 
     private static Deadline convertDeadlineFromFileFormat(String[] parts) {
         checkIfValidFormat(parts, 4);
-        Deadline deadline;
 
         Optional<LocalDateTime> dateOpt = dateParser.parse(parts[2]);
 
+        Deadline deadline = parseDatesAndCreateDeadline(parts, dateOpt);
+
+        checkAndMark(deadline, parts, 3);
+
+        return deadline;
+    }
+
+    private static Deadline parseDatesAndCreateDeadline(String[] parts, Optional<LocalDateTime> dateOpt) {
         if (dateOpt.isPresent()) {
             LocalDateTime actualDate = dateOpt.get();
-            deadline = new Deadline(parts[1], actualDate, "");
+            return new Deadline(parts[1], actualDate, "");
         } else {
-            deadline = new Deadline(parts[1], null, parts[2]);
+            return new Deadline(parts[1], null, parts[2]);
         }
-
-        if (parts[3].equals("1")) {
-            deadline.mark();
-        }
-        return deadline;
     }
 
     private static ToDo convertToDoFromFileFormat(String[] parts) {
         checkIfValidFormat(parts, 3);
         ToDo todo = new ToDo(parts[1]);
 
-        if (parts[2].equals("1")) {
-            todo.mark();
-        }
+        checkAndMark(todo, parts, 2);
         return todo;
+    }
+
+    private static void checkAndMark(Task task, String[] parts, int index) {
+        if (parts[index].equals("1")) {
+            task.mark();
+        }
     }
 
     private static void checkIfValidFormat(String[] parts, int expectedPartsLength) {

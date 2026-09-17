@@ -210,13 +210,13 @@ public class UI {
         int i = 1;
         int j = 1;
         printBar();
-        response += sunnyVoice.getText("haveEvents") + "\n";
+        response += sunnyVoice.getText("haveEvents") + "\n\n";
         for (Task event : events) {
             System.out.println(i + "." + event);
             response += i + "." + event + "\n";
             i += 1;
         }
-        response += sunnyVoice.getText("haveDeadlines") + "\n";
+        response += "\n" + sunnyVoice.getText("haveDeadlines") + "\n\n";
         for (Task deadline : deadlines) {
             System.out.println(j + "." + deadline);
             response += j + "." + deadline + "\n";
@@ -229,7 +229,7 @@ public class UI {
     private void replyHaveEventsNoDeadlines(ArrayList<Task> events, String response) {
         int i = 1;
         printBar();
-        response += sunnyVoice.getText("haveEvents") + "\n";
+        response += sunnyVoice.getText("haveEvents") + "\n\n";
         for (Task event : events) {
             System.out.println(i + "." + event);
             response += i + "." + event + "\n";
@@ -237,21 +237,21 @@ public class UI {
         }
         sunnyVoice.speak("noDeadlines");
         printBar();
-        lastResponse = response + "\n" + sunnyVoice.getText("noDeadlines");
+        lastResponse = response + "\n\n" + sunnyVoice.getText("noDeadlines");
     }
 
     private void replyNoEventsHaveDeadlines(ArrayList<Task> deadlines, String response) {
         int i = 1;
         printBar();
         sunnyVoice.speak("noEvents");
-        response += sunnyVoice.getText("haveDeadlines") + "\n";
+        response += sunnyVoice.getText("haveDeadlines") + "\n\n";
         for (Task deadline : deadlines) {
             System.out.println(i + "." + deadline);
             response += i + "." + deadline + "\n";
             i += 1;
         }
         printBar();
-        lastResponse = sunnyVoice.getText("noEvents") + "\n" + response;
+        lastResponse = sunnyVoice.getText("noEvents") + "\n\n" + response;
     }
 
     private void replyNoEventsOrDeadlines() {
@@ -259,11 +259,11 @@ public class UI {
         sunnyVoice.speak("noEvents");
         sunnyVoice.speak("noDeadlines");
         printBar();
-        lastResponse = sunnyVoice.getText("noEvents") + "\n" + sunnyVoice.getText("noDeadlines");
+        lastResponse = sunnyVoice.getText("noEvents") + "\n\n" + sunnyVoice.getText("noDeadlines");
     }
 
     /**
-     * Prints a list of the available commands.
+     * Replies with a list of the available commands.
      */
     public void replyHelp() {
         printBar();
@@ -272,6 +272,11 @@ public class UI {
         printBar();
     }
 
+    /**
+     * Replies with a specific error description.
+     *
+     * @param e the message from the error.
+     */
     public void replyError(String e) {
         printBar();
         System.out.println(e);

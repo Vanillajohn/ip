@@ -5,6 +5,13 @@ not like you, providing functional utility with interesting interactions.
 
 ![Ui.png](Ui.png)
 
+## Quick start
+
+Ensure you have Java JDK 25 installed and set as your `JAVA_HOME`. You may check this by running 
+`java --version` in your terminal.
+
+Download the `.jar` file to a new folder, then in your terminal, run `java -jar sunny.jar`. A window should open with Sunny giving you a snarky greeting.
+
 # Features
 
 ## Notes
@@ -40,6 +47,7 @@ Examples:
 - `deadline meet Sunny /by 12/12/2026 1345` since the date and time are valid, it is saved as `12-12-2026 1345`.
 - `deadline meet Sunny /by Tomorrow` since the date is invalid, it is saved as `Tomorrow`.
 - `deadline meet Sunny /by 12/13/2026` since the date is invalid, it is saved as `12/13/2026`.
+
 ![img_1.png](img_1.png)
 
 ## Adding Events
@@ -50,7 +58,9 @@ Sunny would then give a witty remark, display the task being added, and inform y
 Format: `event <description> /from <date> /to <date>`
 
 Example: 
+
 - `event meet Sunny /from 12/12/2026 /to 13/12/2026` since both dates are valid, they are saved as `12-12-2026 2359` and `13-12-2026 2359`.
+- 
 ![img_2.png](img_2.png)
 
 ## Listing all tasks (list)
@@ -77,6 +87,7 @@ Marks the task at the specified index.
 Format: `mark <index>`
 
 Example:
+
 ![img_6.png](img_6.png)
 
 ## Unmark
@@ -94,6 +105,7 @@ Finds tasks whose **descriptions** matches the keyword.
 Format: `find <keyword>`
 
 Example:
+
 ![img_4.png](img_4.png)
 
 ## Viewing a day's schedule (viewschedule)
@@ -103,6 +115,7 @@ Displays events if the input date is **between** the event's start and end dates
 Format: `viewschedule <valid date>`
 
 Example:
+
 ![img_5.png](img_5.png)
 
 ## Viewing help (help)
@@ -121,7 +134,13 @@ Sunny saves data after every command that requires manipulating tasks.
 ## Editing data
 Sunny saves data in a `.txt` file in the root of the `.jar` file, namely `[JAR FILE PATH]/data/Sunny'sAmazingTaskboard(ForHerBothersomeUser)`. 
 You are welcome to edit it, especially to clear all data rather than deleting tasks one by one.
+
 > [!CAUTION]
 > Sunny uses very specific formatting for saving and reading data, and if any corruption / invalid data is detected, 
 > Sunny will clear the data file and restart with an empty taskboard. Only edit the data file if you are sure of the 
 > required formatting, and if possible, back up the file before editing.
+
+## Issues
+If the data file is corrupted, such as text being different from what is expected, for safety reasons Sunny will purge the data and
+make a new data file. 
+If access to the data file is denied, 
