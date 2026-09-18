@@ -33,7 +33,8 @@ public class SunnyVoice {
             "Don't tell anyone I helped you, got it?",
             "I can't believe I get worried when I'm not there to help you.",
             "Jeez, you really depend on me, don't you?",
-            "Ugh, I might actually be getting comfortable with this.");
+            "Ugh, I might actually be getting comfortable with this.",
+            "You'll chat with me again soon, right?");
     List<String> taskRemarks = List.of(
             "I'm only helping you because you now owe me.",
             "I could be doing so much more right now.",
@@ -126,7 +127,7 @@ public class SunnyVoice {
             "I'm DEFINITELY not bummed that I can't see you that day with these tasks:",
             "Got some events on that day, so I can't see you. Sad? Gosh I hope not.");
     List<String> haveDeadlines = List.of(
-            "By the way, you still have deadlines due:",
+            "By the way, in case you hit your head and forgot, you still have deadlines due:",
             "Don't forget about these deadlines, you nimrod:",
             "I don't care much...but there's some deadlines you might've forgotten about:");
     List<String> noEvents = List.of(
@@ -141,6 +142,14 @@ public class SunnyVoice {
             "Start date after the end date? Breaking spacetime, are we?",
             "Dude, you can't time travel. Your start date can't be after your end date!",
             "Do you need to retake elementary? Start dates can't possibly be after end dates!");
+    List<String> dateEmpty = List.of(
+            "Well if you're not giving me a date, I'm not making this task for ya!",
+            "Am I supposed to predict what dates you'll need? Don't leave the date field empty, dummy!",
+            "Hey! Give me a date! WAIT. No. That's not what I mean! Your task! I need a date for your task!");
+    List<String> equalDates = List.of(
+            "So, you're starting and ending on the SAME date and time. Do you know how ridiculous that sounds? Change the times or something!",
+            "I'm sorry, does your event end the moment it starts? Change the times, or do you plan to just blink?",
+            "Same date AND time for your event's start and end? You do know you can change the time, right?");
     List<String> titles = List.of(
             "Ughhh!",
             "Hmpf!",
@@ -150,7 +159,7 @@ public class SunnyVoice {
     List<String> help = List.of("""
             You've gotta be kidding me\s
             -----------------------------------------\s
-            All commands are case insensitive.\s
+            All commands are case insensitive. Or are they? Yes, they are.\s
             Valid date formats are DD/MM/YYYY HHMM, DD-MM-YYYY HHMM or either format without HHMM behind.\s
             "Tomorrow" can be a date, but without any numbers, nothing I can do to compare it with others.\s
             \s
@@ -172,7 +181,7 @@ public class SunnyVoice {
             -----------------------------------------\s
             Commands are case insensitive.\s
             Valid date formats are DD/MM/YYYY HHMM, DD-MM-YYYY HHMM or either format without HHMM behind.\s
-            You can use "Tomorrow" as a date but I'm won't compare it with others!\s
+            You can use "Tomorrow" as a date but I won't compare it with others!\s
             \s
             The commands my stupid developer bothered to code in are:\s
             - "Todo <description>" - creates a ToDo task with a description.\s
@@ -198,7 +207,7 @@ public class SunnyVoice {
      */
     public List<String> getListException (String pool) {
         int index;
-        switch (pool){
+        switch (pool) {
             case "descEmpty":
                 index = this.rand.nextInt(descEmptyRemarks.size());
                 return descEmptyRemarks.get(index);
@@ -217,25 +226,19 @@ public class SunnyVoice {
      * @return a String exception remark.
      */
     public String getException(String pool) {
-        switch(pool){
-            case "tooMany":
-                return getExceptionHelper(tooManyRemarks);
-            case "insufficient":
-                return getExceptionHelper(insufficientRemarks);
-            case "missingTask":
-                return getExceptionHelper(missingTaskRemarks);
-            case "unrecognised":
-                return getExceptionHelper(unrecognisedRemarks);
-            case "notInteger":
-                return getExceptionHelper(notIntegerRemarks);
-            case "tooManyKeywords":
-                return getExceptionHelper(tooManyKeywordsRemarks);
-            case "incorrectDateFormat":
-                return getExceptionHelper(incorrectDateFormat);
-            case "startAfterEnd":
-                return getExceptionHelper(startAfterEnd);
-        }
-        return "The input text is wrong, you dumb developer!";
+        return switch (pool) {
+            case "tooMany" -> getExceptionHelper(tooManyRemarks);
+            case "insufficient" -> getExceptionHelper(insufficientRemarks);
+            case "missingTask" -> getExceptionHelper(missingTaskRemarks);
+            case "unrecognised" -> getExceptionHelper(unrecognisedRemarks);
+            case "notInteger" -> getExceptionHelper(notIntegerRemarks);
+            case "tooManyKeywords" -> getExceptionHelper(tooManyKeywordsRemarks);
+            case "incorrectDateFormat" -> getExceptionHelper(incorrectDateFormat);
+            case "startAfterEnd" -> getExceptionHelper(startAfterEnd);
+            case "dateEmpty" -> getExceptionHelper(dateEmpty);
+            case "equalDates" -> getExceptionHelper(equalDates);
+            default -> "The input text is wrong, you dumb developer!";
+        };
     }
 
     private String getExceptionHelper(List<String> text) {
@@ -250,7 +253,7 @@ public class SunnyVoice {
      * @param pool the name of the List<String> remarks available above.
      */
     public void speak(String pool) {//when a remark is given
-        switch(pool) {
+        switch (pool) {
             case "greetings":
                 speakHelper(greetings);
                 break;
@@ -320,47 +323,30 @@ public class SunnyVoice {
      * @return the remark chosen from the List<String>
      */
     public String getText(String pool) {//when a remark is given
-        switch(pool) {
-            case "greetings":
-                return getTextHelper(greetings);
-            case "goodbyes":
-                return getTextHelper(goodbyes);
-            case "taskRemarks":
-                return getTextHelper(taskRemarks);
-            case "taskMark":
-                return getTextHelper(taskMarkRemarks);
-            case "taskUnmark":
-                return getTextHelper(taskUnmarkRemarks);
-            case "listRemarks":
-                return getTextHelper(listRemarks);
-            case "taskAddRemarks":
-                return getTextHelper(taskAddRemarks);
-            case "deleting":
-                return getTextHelper(deletingRemarks);
-            case "foundTasks":
-                return getTextHelper(foundTasksRemarks);
-            case "noFoundTasks":
-                return getTextHelper(noFoundTasksRemarks);
-            case "noList":
-                return getTextHelper(noListRemarks);
-            case "noTasksLeft":
-                return getTextHelper(noTasksLeft);
-            case "haveEvents":
-                return getTextHelper(haveEvents);
-            case "haveDeadlines":
-                return getTextHelper(haveDeadlines);
-            case "noEvents":
-                return getTextHelper(noEvents);
-            case "noDeadlines":
-                return getTextHelper(noDeadlines);
-            case "help":
-                return getTextHelper(help);
-            case "startAfterEnd":
-                return getTextHelper(startAfterEnd);
-            case "titles":
-                return getTextHelper(titles);
-        }
-        return "The input text is wrong, you dumb developer!";
+        return switch (pool) {
+            case "greetings" -> getTextHelper(greetings);
+            case "goodbyes" -> getTextHelper(goodbyes);
+            case "taskRemarks" -> getTextHelper(taskRemarks);
+            case "taskMark" -> getTextHelper(taskMarkRemarks);
+            case "taskUnmark" -> getTextHelper(taskUnmarkRemarks);
+            case "listRemarks" -> getTextHelper(listRemarks);
+            case "taskAddRemarks" -> getTextHelper(taskAddRemarks);
+            case "deleting" -> getTextHelper(deletingRemarks);
+            case "foundTasks" -> getTextHelper(foundTasksRemarks);
+            case "noFoundTasks" -> getTextHelper(noFoundTasksRemarks);
+            case "noList" -> getTextHelper(noListRemarks);
+            case "noTasksLeft" -> getTextHelper(noTasksLeft);
+            case "haveEvents" -> getTextHelper(haveEvents);
+            case "haveDeadlines" -> getTextHelper(haveDeadlines);
+            case "noEvents" -> getTextHelper(noEvents);
+            case "noDeadlines" -> getTextHelper(noDeadlines);
+            case "help" -> getTextHelper(help);
+            case "startAfterEnd" -> getTextHelper(startAfterEnd);
+            case "titles" -> getTextHelper(titles);
+            case "dateEmpty" -> getTextHelper(dateEmpty);
+            case "equalDates" -> getTextHelper(equalDates);
+            default -> "The input text is wrong, you dumb developer!";
+        };
     }
 
     /**

@@ -140,7 +140,11 @@ You are welcome to edit it, especially to clear all data rather than deleting ta
 > Sunny will clear the data file and restart with an empty taskboard. Only edit the data file if you are sure of the 
 > required formatting, and if possible, back up the file before editing.
 
-## Issues
-If the data file is corrupted, such as text being different from what is expected, for safety reasons Sunny will purge the data and
+## Application responses to issues
+If the data file is corrupted, such as any text being different from what is expected, for safety reasons Sunny will purge ALL data and
 make a new data file. 
-If access to the data file is denied, 
+
+If access to the data file is denied, Sunny will inform the user within the application window.
+
+If the program is broken, such as any component within the `.jar` files being missing, the applicaiton will not run and 
+inform the user that the `.jar` file should be reinstalled.

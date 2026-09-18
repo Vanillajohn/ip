@@ -209,7 +209,7 @@ public class UserParser {
             throwInsufficient(ui);
         }
 
-        EventDetails details = new EventDetails(input, firstSlash, secondSlash);
+        EventDetails details = new EventDetails(input, firstSlash, secondSlash, ui);
         Task event = createEventForExecuteEventMethod(ui, details.startOpt, details.endOpt, details.desc, details.endString, details.startString);
 
         commandType = "task";
@@ -223,10 +223,16 @@ public class UserParser {
         public Optional<LocalDateTime> startOpt;
         public Optional<LocalDateTime> endOpt;
 
-        public EventDetails(String input, int firstSlash, int secondSlash) {
+        public EventDetails(String input, int firstSlash, int secondSlash, UI ui) throws TaskEmptyDescException, IncorrectDateFormatException {
             this.desc = input.substring(6, firstSlash);
+            checkIfDeadlineOrEventDescriptionEmpty(desc, ui, "event");
+
             this.startString = input.substring(firstSlash + 5, secondSlash).trim();
+            checkIfDateIsEmpty(startString, ui);
+
             this.endString = input.substring(secondSlash + 3).trim();
+            checkIfDateIsEmpty(endString, ui);
+
             this.startOpt = parser.parse(startString);
             this.endOpt = parser.parse(endString);
         }
@@ -236,6 +242,9 @@ public class UserParser {
         if (startOpt.isPresent() && endOpt.isPresent()) {
             if (startOpt.get().isAfter(endOpt.get())) {
                 throwInvalidDates(ui);
+            }
+            if (startOpt.get().isEqual(endOpt.get())) {
+                throwEqualDates(ui);
             }
             LocalDateTime startActual = startOpt.get();
             LocalDateTime endActual = endOpt.get();
@@ -247,18 +256,21 @@ public class UserParser {
             LocalDateTime endActual = endOpt.get();
             return new Event(desc, null, endActual, startString, "");
         } else {
+            if (startString.equals(endString)) {
+                throwEqualDates(ui);
+            }
             return new Event(desc, null, null, startString, endString);
         }
     }
 
-    private Task executeDeadline(String input, UI ui, String[] parts) throws TaskEmptyDescException, InsufficientInfoException {
+    private Task executeDeadline(String input, UI ui, String[] parts) throws TaskEmptyDescException, InsufficientInfoException, IncorrectDateFormatException {
         checkIfDescEmpty(parts, ui, "deadline");
         int slashIndex = input.indexOf("/by");
         if (slashIndex == -1) {
             throwInsufficient(ui);
         }
 
-        DeadlineDetails details = new DeadlineDetails(input, slashIndex);
+        DeadlineDetails details = new DeadlineDetails(input, slashIndex, ui);
         Task deadline = createDeadlineForExecuteDeadlineMethod(details.dateOpt, details.description, details.dateString);
 
         commandType = "task";
@@ -270,9 +282,13 @@ public class UserParser {
         public String dateString;
         public Optional<LocalDateTime> dateOpt;
 
-        public DeadlineDetails(String input, int slashIndex) {
-            this. description = String.join(" ", input.substring(9, slashIndex)).trim();
-            this. dateString = input.substring(slashIndex + 3).trim();
+        public DeadlineDetails(String input, int slashIndex, UI ui) throws TaskEmptyDescException, IncorrectDateFormatException {
+            this.description = String.join(" ", input.substring(9, slashIndex)).trim();
+            checkIfDeadlineOrEventDescriptionEmpty(description, ui, "deadline");
+
+            this.dateString = input.substring(slashIndex + 3).trim();
+            checkIfDateIsEmpty(dateString, ui);
+
             this.dateOpt = parser.parse(dateString);
         }
     }
@@ -404,7 +420,7 @@ public class UserParser {
         } catch (NumberFormatException e) {
             ui.setLastResponse(sunnyVoice.getException("notInteger"));
             commandType = "error";
-            throw new NumberFormatException();
+            throw new NumberFormatException(sunnyVoice.getException("notInteger"));
         }
     }
 
@@ -414,10 +430,34 @@ public class UserParser {
 
     private void checkIfDescEmpty(String[] parts, UI ui, String task) throws TaskEmptyDescException {
         if (parts.length == 1){
-            List<String> remarks = sunnyVoice.getDescEmptyRemarks();
-            ui.setLastResponse(remarks.get(0) +  task + remarks.get(1));
-            commandType = "error";
-            throw new TaskEmptyDescException(sunnyVoice.getListException("descEmpty"), task);
+            throwDescEmpty(ui, task);
         }
+    }
+
+    private void checkIfDeadlineOrEventDescriptionEmpty(String desc, UI ui, String task) throws TaskEmptyDescException {
+        if (desc.isEmpty()) {
+            throwDescEmpty(ui, task);
+        }
+    }
+
+    private void throwDescEmpty(UI ui, String task) throws TaskEmptyDescException {
+        List<String> remarks = sunnyVoice.getDescEmptyRemarks();
+        ui.setLastResponse(remarks.get(0) + task + remarks.get(1));
+        commandType = "error";
+        throw new TaskEmptyDescException(sunnyVoice.getListException("descEmpty"), task);
+    }
+
+    private void checkIfDateIsEmpty(String date, UI ui) throws IncorrectDateFormatException{
+        if (date.isEmpty()) {
+            ui.setLastResponse(sunnyVoice.getException("dateEmpty"));
+            commandType = "error";
+            throw new IncorrectDateFormatException(sunnyVoice.getException("dateEmpty"));
+        }
+    }
+
+    private void throwEqualDates(UI ui) throws IncorrectDateFormatException{
+        ui.setLastResponse(sunnyVoice.getException("equalDates"));
+        commandType = "error";
+        throw new IncorrectDateFormatException(sunnyVoice.getException("equalDates"));
     }
 }

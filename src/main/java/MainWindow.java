@@ -30,7 +30,6 @@ public class MainWindow extends AnchorPane {
 
     @FXML
     public void initialize() {
-        scrollPane.vvalueProperty().bind(dialogContainer.heightProperty());
         scrollPane.setFitToWidth(true);
         dialogContainer.setFillWidth(true);
     }
@@ -60,6 +59,8 @@ public class MainWindow extends AnchorPane {
                 DialogBox.getUserDialog(input, userImage),
                 DialogBox.getSunnyDialog(response, sunnyImage, commandType)
         );
+        Platform.runLater(() -> scrollPane.setVvalue(1.0));
+
         if (input.equalsIgnoreCase("bye")) {
             closeAfterDelay();
         }
